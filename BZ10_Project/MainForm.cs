@@ -398,7 +398,7 @@ namespace BZ10
         {
             try
             {
-              
+
                 System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
                 label2.ForeColor = System.Drawing.Color.Green;
                 asc.controllInitializeSize(this);
@@ -859,7 +859,7 @@ namespace BZ10
                         DebOutPut.DebLog("当前发送第  " + (i + 1) + "  个，路径为:  " + path);
                         if (Param.NetworkCommunication == "0")//Socket通讯方式
                         {
-                            if (tcpclient != null && tcpclient.clientSocket != null && tcpclient.clientSocket.Connected)
+                            if (tcpclient != null && tcpclient.clientSocket != null && tcpclient.clientSocket.Connected && TcpClient.newDateTime.AddMinutes(5) > DateTime.Now)
                             {
                                 bool isSuccess = tcpclient.SendPicMsg(dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo), path);
                                 if (isSuccess)
@@ -901,6 +901,11 @@ namespace BZ10
                                     }
                                 }
                             }
+                            else
+                            {
+                                DebOutPut.DebLog("数据发送失败,发送数据条件不满足！");
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "数据发送失败,发送数据条件不满足！");
+                            }
                         }
                         else
                         {
@@ -913,6 +918,7 @@ namespace BZ10
                             }
                         }
                     }
+                    UploadTable.Dispose();//释放资源
                 }
                 catch (Exception ex)
                 {
@@ -934,7 +940,7 @@ namespace BZ10
             try
             {
                 DebOutPut.DebLog("设备初始化");
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "设备初始化");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "设备初始化");
                 //1.设备初始化，全部归原点。
                 Cmd.CommunicateDp(0x10, 0);//轴一找原点
                 DebOutPut.DebLog("轴一找原点");
@@ -1293,24 +1299,24 @@ namespace BZ10
                 //2. 推片准备：轴3 到原点位置 轴4到原点位置/推完片位置
                 Cmd.CommunicateDp(0x33, 1);
                 DebOutPut.DebLog("执行0x33完毕");
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "执行0x33完毕");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "执行0x33完毕");
                 Thread.Sleep(15000);
                 if (Param.recoveryDevice == "0")
                     Cmd.CommunicateDp(0x43, 1);
                 else if (Param.recoveryDevice == "1")
                     Cmd.CommunicateDp(0x43, 2);
                 DebOutPut.DebLog("执行0x43完毕");
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "执行0x43完毕");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "执行0x43完毕");
                 Thread.Sleep(20000);
                 //履带电机运动
                 DebOutPut.DebLog("履带电机运动");
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "履带电机运动");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "履带电机运动");
                 MoveTrack();
                 DebOutPut.DebLog("履带电机运动完毕");
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "履带电机运动完毕");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "履带电机运动完毕");
                 bStep = 12;
                 DebOutPut.DebLog("bStep赋值：" + bStep);
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "bStep赋值：" + bStep);
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "bStep赋值：" + bStep);
                 list.Clear();
                 list.Add(7);
                 if (Param.recoveryDevice == "0")
@@ -2104,7 +2110,7 @@ namespace BZ10
                         else if (!autoFlag)
                         {
                             DebOutPut.DebLog("恢复正常模式_设备初始化");
-                            DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "恢复正常模式_设备初始化");
+                            DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "恢复正常模式_设备初始化");
                             Cmd.CommunicateDp(0x10, 0);
                             DebOutPut.DebLog("恢复正常模式_轴一找原点");
                             Cmd.CommunicateDp(0x20, 0);
@@ -2308,7 +2314,7 @@ namespace BZ10
                         else if (!autoFlag) //非自动运行
                         {
                             DebOutPut.DebLog("工作模式切换_设备初始化");
-                            DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "工作模式切换_设备初始化");
+                            DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "工作模式切换_设备初始化");
                             Cmd.CommunicateDp(0x10, 0);
                             DebOutPut.DebLog("工作模式切换_轴一找原点");
                             Cmd.CommunicateDp(0x20, 0);
@@ -3206,7 +3212,11 @@ namespace BZ10
                 // ch:标志位置位true | en:Set position bit true
                 //m_bGrabbing = true;
                 // ch:显示 | en:Display
-                nRet = m_pMyCamera.MV_CC_Display_NET(Cv_Main1.Handle);
+
+                this.Invoke(new EventHandler(delegate
+                {
+                    nRet = m_pMyCamera.MV_CC_Display_NET(Cv_Main1.Handle);
+                }));
 
                 if (MyCamera.MV_OK != nRet)
                 {
@@ -3244,13 +3254,18 @@ namespace BZ10
             {
                 lock (locker_)
                 {
-                    if (roundrobin[0] == 1)
-                        Cv_Main1.Image = bmp1_;
-                    else
-                        Cv_Main1.Image = bmp2_;
-                    roundrobin_ = roundrobin[0];
+                    this.Invoke((EventHandler)delegate
+                    {
+                        if (roundrobin[0] == 1)
+                            Cv_Main1.Image = bmp1_;
+                        else
+                            Cv_Main1.Image = bmp2_;
+
+                        roundrobin_ = roundrobin[0];
+
+                        Cv_Main1.Invalidate();
+                    });
                 }
-                Cv_Main1.Invalidate();
             }
             catch (Exception ex)
             {
@@ -3565,7 +3580,7 @@ namespace BZ10
                         string sql = "", collectTime = "";
                         DateTime dt = DateTime.Now;//采集时间
                         Bitmap img = new Bitmap(realTimeImage);
-
+                        collectTime = dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo);
                         //图片添加水印
                         if (img != null)
                         {
@@ -3573,7 +3588,6 @@ namespace BZ10
                             {
                                 using (Graphics g = Graphics.FromImage(img))
                                 {
-                                    collectTime = dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo);
                                     string devNum = "ID:" + Param.DeviceID;
                                     string time = "时间:" + collectTime;
                                     string wendu = (this.lb_wd.Text.Trim() == "温度" || this.lb_wd.Text.Trim() == "无数据") ? "温度:---" : this.lb_wd.Text.Trim();
@@ -3589,7 +3603,6 @@ namespace BZ10
                             {
                                 using (Graphics g = Graphics.FromImage(img))
                                 {
-                                    collectTime = dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo);
                                     string devNum = "ID:" + Param.DeviceID;
                                     string time = "时间:" + collectTime;
                                     string context = devNum + "   " + time;
@@ -3828,7 +3841,7 @@ namespace BZ10
                     }
                     else if (stuta == "00")
                     {
-                        label19.Text = "正常";    
+                        label19.Text = "正常";
                         label19.ForeColor = System.Drawing.Color.Black;
                         count++;
                     }
@@ -3849,7 +3862,7 @@ namespace BZ10
                     {
                         str += "载玻片" + label21.Text.Trim();
                     }
-                    if (label20.Text.Trim() == "培养液缺液") 
+                    if (label20.Text.Trim() == "培养液缺液")
                     {
                         if (str != "")
                         {
@@ -7572,7 +7585,7 @@ namespace BZ10
                             if (tcpclient != null)
                                 tcpclient.sendLocation(dlat, dlon);
                         }
-                        
+
                     }
                 }
             }
@@ -7801,13 +7814,17 @@ namespace BZ10
         {
             lock (oldLocker_)
             {
-                if (roundrobin[0] == 1)
-                    Cv_Main1.Image = oldBmp1;
-                else
-                    Cv_Main1.Image = oldBmp2;
-                odlRoundrobin_ = roundrobin[0];
+                this.Invoke((EventHandler)delegate
+                {
+                    if (roundrobin[0] == 1)
+                        Cv_Main1.Image = oldBmp1;
+                    else
+                        Cv_Main1.Image = oldBmp2;
+                    odlRoundrobin_ = roundrobin[0];
+
+                    Cv_Main1.Invalidate();
+                });
             }
-            Cv_Main1.Invalidate();
         }
 
         void OldDelegateOnExposureCallback()
