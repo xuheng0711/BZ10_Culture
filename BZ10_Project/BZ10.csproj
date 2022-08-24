@@ -205,6 +205,7 @@
     <Compile Include="Form4.Designer.cs">
       <DependentUpon>Form4.cs</DependentUpon>
     </Compile>
+    <Compile Include="HttpRequest.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

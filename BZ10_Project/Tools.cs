@@ -1,5 +1,6 @@
 ﻿using BZ10.Common;
 using Microsoft.Win32;
+using SporeDetectionEquipment;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,10 +66,36 @@ namespace BZ10
         /// <param name="strValue"></param>
         /// <returns></returns>
         public static bool IsAllUpChar(string strValue)
-        {
+        {   
             bool result = Regex.IsMatch(strValue, @"^[A-Z]+$");
             return result;
         }
+
+        /// <summary>
+        /// 图片转BASE64
+        /// </summary>
+        /// <param name="picPath"></param>
+        /// <returns></returns>
+        public static string GetBase64FromPic(string picPath)
+        {
+            try
+            {
+                FileStream fs = new FileStream(picPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                long size = fs.Length;
+                byte[] array = new byte[size];
+                fs.Read(array, 0, array.Length);
+                fs.Close();
+                Base64Encoder en = new Base64Encoder();
+                return en.GetEncoded(array);
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+                return "";
+            }
+        }
+
         /// <summary>
         /// hexString转byte[]
         /// </summary>

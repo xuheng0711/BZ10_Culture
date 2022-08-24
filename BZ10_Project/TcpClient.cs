@@ -319,30 +319,6 @@ namespace BZ10
         }
 
         #region 数据发送
-        /// <summary>
-        /// 图片转BASE64
-        /// </summary>
-        /// <param name="picPath"></param>
-        /// <returns></returns>
-        public string getBase64FromPic(string picPath)
-        {
-            try
-            {
-                FileStream fs = new FileStream(picPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                long size = fs.Length;
-                byte[] array = new byte[size];
-                fs.Read(array, 0, array.Length);
-                fs.Close();
-                Base64Encoder en = new Base64Encoder();
-                return en.GetEncoded(array);
-            }
-            catch (Exception ex)
-            {
-                DebOutPut.DebLog(ex.ToString());
-                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
-                return "";
-            }
-        }
         public static string byteToHexStr(byte[] bytes, int n)
         {
             try
@@ -523,7 +499,7 @@ namespace BZ10
                 infopic.err = "";
                 picMsg pic = new picMsg();
                 pic.collectTime = time;
-                pic.picStr = getBase64FromPic(path);
+                pic.picStr =Tools.GetBase64FromPic(path);
                 infopic.message = pic;
 
                 FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -561,7 +537,7 @@ namespace BZ10
 
                 picMsg pic = new picMsg();
                 pic.collectTime = time;
-                pic.picStr = getBase64FromPic(Param.BasePath + "\\GrabImg\\tempImg.bmp");
+                pic.picStr = Tools.GetBase64FromPic(Param.BasePath + "\\GrabImg\\tempImg.bmp");
                 infopic.message = pic;
                 SendMsg(infopic.ObjectToJson());
             }

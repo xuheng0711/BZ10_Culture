@@ -41,6 +41,8 @@ namespace BZ10
         //采集时间
         public static string CollectHour = "";
         public static string CollectMinute = "";
+        //通讯模式
+        public static string NetworkCommunication = "0";
         //设备运行标记
         public static string RunFlag = "";
         //串口端口号
@@ -209,6 +211,7 @@ namespace BZ10
                         ComValue = "COM" + rd.Next(1, 20).ToString();
                     SerialPortCamera = ComValue;
                 }
+                NetworkCommunication = Read_ConfigParam(configfileName, "Config", "NetworkCommunication");//通讯方式
                 RunFlag = Read_ConfigParam(configfileName, "Config", "RunFlag");//运行模式
                 FanMinutes = Read_ConfigParam(configfileName, "Config", "FanMinutes");//采集时间
                 FanStrength = Read_ConfigParam(configfileName, "Config", "FanStrength");//采集强度

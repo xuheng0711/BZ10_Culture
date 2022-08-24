@@ -136,6 +136,7 @@ namespace BZ10
         private int roundrobin_ = 2;
         //private String StatusInfo = "正常";
         public TcpClient tcpclient = null;
+        private HttpRequest httpRequest = null;
         private bool _reconnection = true;
         GlobalParam global = new GlobalParam();
         private double wd;
@@ -397,6 +398,7 @@ namespace BZ10
         {
             try
             {
+              
                 System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
                 label2.ForeColor = System.Drawing.Color.Green;
                 asc.controllInitializeSize(this);
@@ -436,7 +438,6 @@ namespace BZ10
                 }
                 //加载配置文件
                 Param.Init_Param(configfileName);
-
                 if (Param.DripDevice == "0")
                 {
                     label78.Text = "转";
@@ -459,9 +460,17 @@ namespace BZ10
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "设备被启动！");
                 //  this.listView1.Items = collectionDispData;
                 //初始化网络连接
-                Thread myThread = new Thread(new ThreadStart(NetServerInit));
-                myThread.IsBackground = true;
-                myThread.Start();
+                if (Param.NetworkCommunication == "0")//Socket通讯方式
+                {
+                    Thread myThread = new Thread(new ThreadStart(NetServerInit));
+                    myThread.IsBackground = true;
+                    myThread.Start();
+                }
+                else
+                {
+                    httpRequest = new HttpRequest();
+                    httpRequest.deviceId = Param.DeviceID;
+                }
                 //RunFlag 0:自动运行 1:定时运行  2:分时运行 
                 if (Param.RunFlag == "0")
                     autoFlag = true;
@@ -472,7 +481,7 @@ namespace BZ10
                 {
                     ReadRecordDate();
                     timer10.Start();
-                    timer12.Start();
+                    timer12.Start();//检测相机
                     if (Param.isContinuousUpload == "1")
                     {
                         this.timer11.Interval = double.Parse(Param.SearchInterval) * 60000;
@@ -831,27 +840,27 @@ namespace BZ10
             {
                 try
                 {
-                    if (tcpclient != null && tcpclient.clientSocket != null && tcpclient.clientSocket.Connected && TcpClient.newDateTime.AddMinutes(5) > DateTime.Now)
+                    DebOutPut.DebLog("检测是否有未发送的照片");
+                    string sql = "select * from Record where Flag='0'";
+                    DataTable UploadTable = DB.QueryDatabase(sql).Tables[0];
+                    string path = "";
+                    DebOutPut.DebLog("未传共  " + UploadTable.Rows.Count + "  个");
+                    for (int i = 0; i < UploadTable.Rows.Count; i++)
                     {
-                        DebOutPut.DebLog("检测是否有未发送的照片");
-                        string sql = "select * from Record where Flag='0'";
-                        DataTable UploadTable = DB.QueryDatabase(sql).Tables[0];
-                        string path = "";
-                        DebOutPut.DebLog("未传共  " + UploadTable.Rows.Count + "  个");
-                        for (int i = 0; i < UploadTable.Rows.Count; i++)
+                        string collectTime = UploadTable.Rows[i]["CollectTime"].ToString();
+                        DateTime dt = Convert.ToDateTime(collectTime);
+                        string imageName = dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
+                        path = Param.BasePath + "\\GrabImg\\" + imageName;
+                        if (!File.Exists(path))
+                        {
+                            DebOutPut.DebLog("文件不存在：" + path);
+                            continue;
+                        }
+                        DebOutPut.DebLog("当前发送第  " + (i + 1) + "  个，路径为:  " + path);
+                        if (Param.NetworkCommunication == "0")//Socket通讯方式
                         {
                             if (tcpclient != null && tcpclient.clientSocket != null && tcpclient.clientSocket.Connected)
                             {
-                                string collectTime = UploadTable.Rows[i]["CollectTime"].ToString();
-                                DateTime dt = Convert.ToDateTime(collectTime);
-                                path = Param.BasePath + "\\GrabImg\\" + dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
-                                string imageName = dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
-                                if (!File.Exists(path))
-                                {
-                                    DebOutPut.DebLog("文件不存在：" + path);
-                                    continue;
-                                }
-                                DebOutPut.DebLog("当前发送第  " + (i + 1) + "  个，路径为:  " + path);
                                 bool isSuccess = tcpclient.SendPicMsg(dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo), path);
                                 if (isSuccess)
                                 {
@@ -890,16 +899,19 @@ namespace BZ10
                                         DebOutPut.DebLog("发现无法上传图像，该图像已被标记，路径为:  " + path);
                                         DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "发现无法上传图像，该图像已被标记，路径为:  " + path);
                                     }
-
                                 }
                             }
                         }
-                        UploadTable.Dispose();
-                    }
-                    else
-                    {
-                        DebOutPut.DebLog("数据发送失败,发送数据条件不满足！");
-                        DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "数据发送失败,发送数据条件不满足！");
+                        else
+                        {
+                            bool isSuccess = httpRequest.SendPicMsg(dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo), path);
+                            if (!isSuccess)
+                            {
+                                DebOutPut.DebLog("图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
+                                break;
+                            }
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -3816,7 +3828,7 @@ namespace BZ10
                     }
                     else if (stuta == "00")
                     {
-                        label19.Text = "正常";
+                        label19.Text = "正常";    
                         label19.ForeColor = System.Drawing.Color.Black;
                         count++;
                     }
@@ -3837,7 +3849,7 @@ namespace BZ10
                     {
                         str += "载玻片" + label21.Text.Trim();
                     }
-                    if (label20.Text.Trim() == "培养液缺液")
+                    if (label20.Text.Trim() == "培养液缺液") 
                     {
                         if (str != "")
                         {
@@ -3908,7 +3920,6 @@ namespace BZ10
         {
             try
             {
-
                 int remain = int.Parse(Param.remain) - 1;//载玻片数量
                 if (remain < 0)
                 {
@@ -3918,7 +3929,10 @@ namespace BZ10
                 Param.remain = Param.Read_ConfigParam("Config.ini", "Config", "remain");
                 this.TxtRemain.Text = ((int.Parse(Param.remain) < 0) ? 0 : int.Parse(Param.remain)).ToString();
                 int currRunMode = this.TxtRunMode.SelectedIndex;//当前工作模式
-                tcpclient.SendSlideGlassCount(134, "", int.Parse(Param.remain), currRunMode, (float)wd);
+                if (Param.NetworkCommunication == "0")//Socket通讯方式
+                {
+                    tcpclient.SendSlideGlassCount(134, "", int.Parse(Param.remain), currRunMode, (float)wd);
+                }
             }
             catch (Exception ex)
             {
@@ -3984,12 +3998,26 @@ namespace BZ10
                         case 0: //已经到达原点位置，
                             DetectMemory();
                             setLocation(0);
-                            tcpclient.SendCurrAction(142, "", "原点");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "原点");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "原点");
+                            }
                             inituipian();
                             break;
                         case 1://已经到达推片位置，推片就绪
                             setLocation(2);
-                            tcpclient.SendCurrAction(142, "", "推片");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "推片");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "推片");
+                            }
                             tuipian();
                             break;
                         case 2://推片已经完成，可以复位了
@@ -4001,7 +4029,14 @@ namespace BZ10
                             break;
                         case 4://滴加粘附液
                             setLocation(4);
-                            tcpclient.SendCurrAction(142, "", "粘附液");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "粘附液");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "粘附液");
+                            }
                             jiafanshilin();
                             break;
                         case 5://推片到风机
@@ -4009,7 +4044,14 @@ namespace BZ10
                             break;
                         case 6:  //打开风机
                             setLocation(6);
-                            tcpclient.SendCurrAction(142, "", "收集");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "收集");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "收集");
+                            }
                             openFengji();
                             break;
                         case 7://关闭风机
@@ -4020,12 +4062,26 @@ namespace BZ10
                             break;
                         case 9://滴加培养液
                             setLocation(8);
-                            tcpclient.SendCurrAction(142, "", "培养液");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "培养液");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "培养液");
+                            }
                             peiyang();
                             break;
                         case 10://推片到拍照位置
                             setLocation(10);
-                            tcpclient.SendCurrAction(142, "", "拍照");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "拍照");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "拍照");
+                            }
                             tuipaizhao();
                             break;
                         case 11://自动聚焦拍照
@@ -4036,7 +4092,14 @@ namespace BZ10
                             break;
                         case 12://回归原点
                             setLocation(12);
-                            tcpclient.SendCurrAction(142, "", "回收");
+                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            {
+                                tcpclient.SendCurrAction(142, "", "回收");
+                            }
+                            else
+                            {
+                                httpRequest.sendDeviceStatus(142, "", "回收");
+                            }
                             finish();
                             break;
                         case 13://开始新的流程
@@ -4476,7 +4539,14 @@ namespace BZ10
                     startTimer1Time = DateTime.Now;
                     timer1.Start();
                 }
-                tcpclient.SendCurrAction(142, "", "拍照");
+                if (Param.NetworkCommunication == "0")//Socket通讯方式
+                {
+                    tcpclient.SendCurrAction(142, "", "拍照");
+                }
+                else
+                {
+                    httpRequest.sendDeviceStatus(142, "", "拍照");
+                }
             }
             catch (Exception ex)
             {
@@ -7497,8 +7567,12 @@ namespace BZ10
                         lat = dlat;
                         lon = dlon;
                         serialPort2.Close();
-                        if (tcpclient != null)
-                            tcpclient.sendLocation(dlat, dlon);
+                        if (Param.NetworkCommunication == "0")
+                        {
+                            if (tcpclient != null)
+                                tcpclient.sendLocation(dlat, dlon);
+                        }
+                        
                     }
                 }
             }
@@ -7884,6 +7958,7 @@ namespace BZ10
             this.txt_Hour.Text = Param.CollectHour;
             this.txt_Mins.Text = Param.CollectMinute;
             this.TxtDevId.Text = Param.DeviceID;
+            this.cbNetworkCommunication.SelectedIndex = int.Parse(Param.NetworkCommunication);//通信方式
             this.TxtRunMode.SelectedIndex = int.Parse(Param.RunFlag);
             this.TxtFanStartTime.Text = Param.FanMinutes;
             this.TxtFanStartStrength.Text = Param.FanStrength;
@@ -8044,7 +8119,10 @@ namespace BZ10
                 {
                     remain1 = 0;
                 }
-                tcpclient.SendSlideGlassCount(134, "", remain1, currRunMode, (float)wd);
+                if (Param.NetworkCommunication == "0")
+                {
+                    tcpclient.SendSlideGlassCount(134, "", remain1, currRunMode, (float)wd);
+                }
                 Thread.Sleep(1000);
             }
             //需要重启的设置项 设备编号、日期格式、主串口、GPS串口、环境串口、相机版本、系统版本、运行模式
@@ -8075,14 +8153,15 @@ namespace BZ10
                 currSelectCameraVersion = "2";
             string sysVersion = Param.Read_ConfigParam(configfileName, "Config", "version");
             string currSysVersion = "";
-
             if (this.CbSysVersion.Text == "无水印版")
                 currSysVersion = "0";
             else if (this.CbSysVersion.Text == "普通版")
                 currSysVersion = "1";
             else if (this.CbSysVersion.Text == "定制版")
                 currSysVersion = "2";
-
+            //通讯方式
+            string NetworkCommunication = Param.Read_ConfigParam(configfileName, "Config", "NetworkCommunication");
+            string currNetworkCommunication = this.cbNetworkCommunication.SelectedIndex.ToString();
             string runFlag1 = Param.Read_ConfigParam(configfileName, "Config", "RunFlag");
             string currRunFlag = "";
             if (this.TxtRunMode.Text == "自动")
@@ -8101,7 +8180,7 @@ namespace BZ10
                 currRecoveryDevice = "0";
             else if (this.CbRecoveryDevice.Text == "70mm轴")
                 currRecoveryDevice = "1";
-            if (this.TxtMainCmd.Text.Trim() != minCom || this.TxtGPSCmd.Text.Trim() != gpsCom || this.TxtHJCmd.Text.Trim() != hjCom || this.TxtViceCmd.Text.Trim() != caCom || cameraVersion != currSelectCameraVersion || sysVersion != currSysVersion || runFlag1 != currRunFlag || mapSelectionScheme != currMapSelectionScheme || FanMode != currFanMode || DripDevice != currDripDevice || RecoveryDevice != currRecoveryDevice)
+            if (this.TxtMainCmd.Text.Trim() != minCom || this.TxtGPSCmd.Text.Trim() != gpsCom || this.TxtHJCmd.Text.Trim() != hjCom || this.TxtViceCmd.Text.Trim() != caCom || cameraVersion != currSelectCameraVersion || sysVersion != currSysVersion || NetworkCommunication != currNetworkCommunication || runFlag1 != currRunFlag || mapSelectionScheme != currMapSelectionScheme || FanMode != currFanMode || DripDevice != currDripDevice || RecoveryDevice != currRecoveryDevice)
             {
                 SetConfig(configfileName);
                 DialogResult dialogResult = MessageBox.Show("检测到您更改了系统关键性配置，将在系统重启之后生效。点击“确定”将立即重启本程序，点击“取消”请稍后手动重启！", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
@@ -8134,6 +8213,7 @@ namespace BZ10
             this.TxttranStepsMax.Enabled = isEnabled;
             this.TxttranClearCount.Enabled = isEnabled;
             //this.groupBox21.Enabled = isEnabled;
+            this.cbNetworkCommunication.Enabled = isEnabled;
             this.TxtRunMode.Enabled = isEnabled;
             this.TxtMainCmd.Enabled = isEnabled;
             this.TxtGPSCmd.Enabled = isEnabled;
@@ -8182,6 +8262,17 @@ namespace BZ10
             else if (this.TxtRunMode.Text == "时段")
                 runflag = "2";
             Param.Set_ConfigParm(configfileName, "Config", "RunFlag", runflag);
+
+            string NetworkCommunication = "";
+            if (this.cbNetworkCommunication.SelectedItem + "" == "Socket")
+            {
+                NetworkCommunication = "0";
+            }
+            else if (this.cbNetworkCommunication.SelectedItem + "" == "Http")
+            {
+                NetworkCommunication = "1";
+            }
+            Param.Set_ConfigParm(configfileName, "Config", "NetworkCommunication", NetworkCommunication);
             Param.Set_ConfigParm(configfileName, "Config", "FanMinutes", this.TxtFanStartTime.Text);
             Param.Set_ConfigParm(configfileName, "Config", "FanStrength", this.TxtFanStartStrength.Text);
             Param.Set_ConfigParm(configfileName, "Config", "peiyangye", this.TxtPeiyangyeCount.Text);
