@@ -31,7 +31,10 @@ namespace BZ10
                 msg.err = err;
                 msg.devId = deviceId;
                 msg.message = status;
-                Post(statusServerUrl, msg.ObjectToJson());
+                string data = msg.ObjectToJson();
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "发送信息:"+ data);
+                string strResponse = Post(statusServerUrl, data);
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "回应:" + strResponse);
             }
             catch (Exception ex)
             {
