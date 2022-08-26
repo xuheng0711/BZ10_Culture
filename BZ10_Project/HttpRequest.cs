@@ -75,10 +75,14 @@ namespace BZ10
                 piclog.picStr = "图像长度：" + size.ToString() + ";BASE64编码长度：" + pic.picStr.Length;
                 infopiclog.message = piclog;
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, infopiclog.ObjectToJson());
-                string res = Post(dataServerUrl, infopic.ObjectToJson());
+                string strResponse = Post(dataServerUrl, infopic.ObjectToJson());
                 //保存日志
-                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "发送返回结果：" + res);
-                Result result = JsonConvert.DeserializeObject<Result>(res);
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "发送返回结果：" + strResponse);
+                if (string.IsNullOrEmpty(strResponse))
+                {
+                    return false;
+                }
+                Result result = JsonConvert.DeserializeObject<Result>(strResponse);
                 if (result.success == 0 && result.devId == infopic.devId && result.func == infopic.func)
                 {
                     string sql = "update Record Set Flag = '1' where CollectTime='" + result.collectTime + "'";
