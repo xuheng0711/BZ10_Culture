@@ -120,7 +120,7 @@ namespace BZ10
         //手动/自动标记
         bool autoFlag = false;//true 开机自动运行  false：定时运行 
         bool isSingleProcess = false;//是否正在执行单流程运行
-        bool bstop = false; //停止标志位
+        bool bstop = false; //停止标志位 
         //显微镜变量
         private delegate void DelegateOnError();
         private delegate void DelegateOnImage(int[] roundrobin);
