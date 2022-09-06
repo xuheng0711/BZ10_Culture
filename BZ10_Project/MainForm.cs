@@ -587,7 +587,7 @@ namespace BZ10
                 else if (!autoFlag)
                 {
                     DebOutPut.DebLog("非自动运行_设备初始化");
-                    DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "非自动运行_设备初始化");
+                    DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "非自动运行_设备初始化");
                     Cmd.CommunicateDp(0x10, 0);
                     DebOutPut.DebLog("非自动运行_轴一找原点");
                     Cmd.CommunicateDp(0x20, 0);
@@ -7287,7 +7287,7 @@ namespace BZ10
                             else if (!autoFlag)
                             {
                                 DebOutPut.DebLog("切换进正常模式_设备初始化");
-                                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "工作模式切换_设备初始化");
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "工作模式切换_设备初始化");
                                 Cmd.CommunicateDp(0x10, 0);
                                 DebOutPut.DebLog("切换进正常模式_轴一找原点");
                                 Cmd.CommunicateDp(0x20, 0);
