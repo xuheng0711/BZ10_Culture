@@ -133,7 +133,7 @@ namespace BZ10
         public static string YCorrecting = "";//纵向矫正
 
         public static string isSoftKeyBoard = "0";//屏幕键盘  0开启  1关闭
-        public static string DripDevice = "0";//滴液装置  0蠕动泵  1注射器
+        public static string DripDevice = "0";//滴液装置  0蠕动泵  1注射器 2电磁阀
         public static string recoveryDevice = "0";//回收装置 0代表50mm长的轴四轴长 1代表70mm长的轴四轴长
         public static string dropTime = "120";//滴液时间，该时间同时对培养液和粘附液起作用
         public static string recordYear = "";//当前年

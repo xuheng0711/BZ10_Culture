@@ -330,7 +330,8 @@ namespace BZ10
                         Tools.WinRestart();
                 }
                 //时间刷新
-                this.LabTimeShow.Text = DateTime.Now.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo);
+                //this.LabTimeShow.Text = DateTime.Now.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo);
+                this.LabTimeShow.Text = DateTime.Now.ToString(Param.dataType);
                 Interlocked.Exchange(ref inTimer8, 0);
             }
         }
@@ -450,6 +451,14 @@ namespace BZ10
                     buttonX18.Visible = true;
                     buttonX19.Visible = true;
                 }
+                else if (Param.DripDevice == "2")
+                {
+                    label78.Text = "(百)毫秒";
+                    label79.Text = "(百)毫秒";
+                    buttonX18.Visible = true;
+                    buttonX19.Visible = true;
+                }
+
                 if (Param.version == "2")
                 {
                     cb_Group1.Visible = true;
@@ -1117,6 +1126,8 @@ namespace BZ10
                     Cmd.CommunicateDp(0x51, Convert.ToInt16(Param.fanshilin));
                 else if (Param.DripDevice == "1")
                     PushingFluidMove(true, Param.fanshilin);
+                else if (Param.DripDevice == "2")
+                    Cmd.CommunicateDp(0x51, Convert.ToInt16(Param.fanshilin));
                 // Timer2Stop();
                 startTime = DateTime.Now;
                 timer2.Start();
@@ -2555,7 +2566,7 @@ namespace BZ10
                         count++;
                     }
                 }
-                else if (Param.DripDevice == "1")
+                else if (Param.DripDevice == "1"|| Param.DripDevice == "2")
                 {
                     string stuta = PushingFluidRead();
                     //无粘附液
@@ -2811,7 +2822,7 @@ namespace BZ10
                         label19.ForeColor = System.Drawing.Color.Black;
                     }
                 }
-                else if (Param.DripDevice == "1")
+                else if (Param.DripDevice == "1" || Param.DripDevice == "2")
                 {
                     string stuta = PushingFluidRead();
                     //无粘附液
@@ -3830,7 +3841,7 @@ namespace BZ10
                     }
 
                 }
-                else if (Param.DripDevice == "1")
+                else if (Param.DripDevice == "1" || Param.DripDevice == "2")
                 {
                     string stuta = PushingFluidRead();
                     if (stuta == "01")
@@ -7439,6 +7450,9 @@ namespace BZ10
                 Param.fanshilin = "400";//粘附液量
             else if (Param.DripDevice == "1")
                 Param.fanshilin = "15";//粘附液量
+            else if (Param.DripDevice == "2")
+                Param.fanshilin = "50";//5秒
+
             if (int.Parse(Param.rightMaxSteps) != 0 || int.Parse(Param.leftMaxSteps) != 0)
             {
                 Param.XCorrecting = "1500";//横向矫正
@@ -8097,6 +8111,8 @@ namespace BZ10
                 this.CbDripDevice.Text = "蠕动泵";
             else if (Param.DripDevice == "1")
                 this.CbDripDevice.Text = "注射器";
+            else if (Param.DripDevice == "2")
+                this.CbDripDevice.Text = "电磁阀";
             if (Param.recoveryDevice == "0")
                 this.CbRecoveryDevice.Text = "50mm轴";
             else if (Param.recoveryDevice == "1")
@@ -8158,6 +8174,8 @@ namespace BZ10
                 currDripDevice = "0";
             else if (this.CbDripDevice.Text == "注射器")
                 currDripDevice = "1";
+            else if (this.CbDripDevice.Text == "电磁阀")
+                currDripDevice = "2";
             string currFanMode = "";
             if (this.CbFanMode.Text == "恒定法")
                 currFanMode = "0";
@@ -8360,6 +8378,8 @@ namespace BZ10
                 currDripDevice = "0";
             else if (this.CbDripDevice.Text == "注射器")
                 currDripDevice = "1";
+            else if (this.CbDripDevice.Text == "电磁阀")
+                currDripDevice = "2";
             Param.Set_ConfigParm(configfileName, "Config", "DripDevice", currDripDevice);
             string currRecoveryDevice = "";
             if (this.CbRecoveryDevice.Text == "50mm轴")

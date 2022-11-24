@@ -355,8 +355,12 @@ namespace BZ10
                         isNeg = false;
                     PushingFluidMove(isNeg, tb_step5.Text);
                 }
-
-
+                if (Param.DripDevice == "2")
+                {
+                    byte dir = (byte)(0x51);
+                    int step = Convert.ToInt32(tb_step5.Text);
+                    CommunicateDp(dir, step);
+                }
             }
             catch (Exception ex)
             {
