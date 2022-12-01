@@ -480,7 +480,7 @@ namespace BZ10
                     if (ret[0] == 0xFF)
                     {
                         int dirs = (ret[7] << 8) | ret[6];
-                        for (int i = 0; i < 15; i++)
+                        for (int i = 0; i < 14; i++)
                         {
                             if (i == 11)
                             {
@@ -504,13 +504,14 @@ namespace BZ10
                 }
                 if (serialPort4 != null || serialPort4.IsOpen)
                 {
-                    if (Param.DripDevice == "1")
+                    if (Param.DripDevice == "1"|| Param.DripDevice == "2")
                     {
                         string stuta = PushingFluidRead();
                         if (stuta == "00")
-                            lb_X12.BackColor = Color.Yellow;
+                            label37.BackColor = Color.Yellow;//17限位
                         else if (stuta == "01")
-                            lb_X12.BackColor = Color.Green;
+                            label37.BackColor = Color.Green;
+
                     }
                 }
                 ReadAxis7Location();
@@ -714,18 +715,18 @@ namespace BZ10
                 AppendLog("收:" + recStr.ToUpper());
                 if (recContent == "01")//当前在右限位
                 {
-                    this.label35.BackColor = Color.Green;
-                    this.label37.BackColor = Color.Yellow;
+                    this.lb_X15.BackColor = Color.Yellow;//限位15
+                    this.label35.BackColor = Color.Green;//限位16
                 }
                 else if (recContent == "02")//以到达左限位
                 {
                     this.label35.BackColor = Color.Yellow;
-                    this.label37.BackColor = Color.Green;
+                    this.lb_X15.BackColor = Color.Green;
                 }
                 else//可自由移动
                 {
                     this.label35.BackColor = Color.Yellow;
-                    this.label37.BackColor = Color.Yellow;
+                    this.lb_X15.BackColor = Color.Yellow;
                 }
             }
             catch (Exception ex)
