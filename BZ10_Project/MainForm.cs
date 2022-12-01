@@ -454,9 +454,9 @@ namespace BZ10
                 else if (Param.DripDevice == "2")
                 {
                     label78.Text = "(百)毫秒";
-                    label79.Text = "(百)毫秒";
-                    buttonX18.Visible = true;
-                    buttonX19.Visible = true;
+                    label79.Text = "(十)毫秒";
+                    buttonX18.Visible = false;
+                    buttonX19.Visible = false;
                 }
 
                 if (Param.version == "2")
