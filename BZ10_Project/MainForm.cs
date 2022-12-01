@@ -2570,12 +2570,12 @@ namespace BZ10
                 {
                     string stuta = PushingFluidRead();
                     //无粘附液
-                    if (stuta == "01")
+                    if (stuta == "00")
                     {
                         label19.Text = "粘附液缺液";
                         label19.ForeColor = System.Drawing.Color.Red;
                     }
-                    else if (stuta == "00")
+                    else if (stuta == "01")
                     {
                         label19.Text = "正常";
                         label19.ForeColor = System.Drawing.Color.Black;
@@ -2826,12 +2826,12 @@ namespace BZ10
                 {
                     string stuta = PushingFluidRead();
                     //无粘附液
-                    if (stuta == "01")
+                    if (stuta == "00")
                     {
                         label19.Text = "粘附液缺液";
                         label19.ForeColor = System.Drawing.Color.Red;
                     }
-                    else if (stuta == "00")
+                    else if (stuta == "01")
                     {
                         label19.Text = "正常";
                         label19.ForeColor = System.Drawing.Color.Black;
@@ -3844,13 +3844,13 @@ namespace BZ10
                 else if (Param.DripDevice == "1" || Param.DripDevice == "2")
                 {
                     string stuta = PushingFluidRead();
-                    if (stuta == "01")
+                    if (stuta == "00")
                     {
                         label19.Text = "粘附液缺液";
                         label19.ForeColor = System.Drawing.Color.Red;
 
                     }
-                    else if (stuta == "00")
+                    else if (stuta == "01")
                     {
                         label19.Text = "正常";
                         label19.ForeColor = System.Drawing.Color.Black;
