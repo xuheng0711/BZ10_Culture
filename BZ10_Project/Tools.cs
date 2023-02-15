@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -184,6 +185,31 @@ namespace BZ10
             {
                 DebOutPut.DebLog(ex.ToString());
                  DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 图片生成新分辨率
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <param name="newW"></param>
+        /// <param name="newH"></param>
+        /// <returns></returns>
+        public static Bitmap KiResizeImage(Bitmap bmp, int newW, int newH)
+        {
+            try
+            {
+                Bitmap bitmap = new Bitmap(newW, newH);
+                Graphics g = Graphics.FromImage(bitmap);
+                // 插值算法的质量
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(bmp, new Rectangle(0, 0, newW, newH), new Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+                g.Dispose();
+                return bitmap;
+            }
+            catch
+            {
                 return null;
             }
         }
