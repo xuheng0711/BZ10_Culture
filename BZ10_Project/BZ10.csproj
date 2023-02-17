@@ -226,6 +226,7 @@
     <Compile Include="TimeManager.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="ToupCam.cs" />
+    <Compile Include="TransferClient.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

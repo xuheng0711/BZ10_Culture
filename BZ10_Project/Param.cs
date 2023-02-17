@@ -146,6 +146,13 @@ namespace BZ10
         public static string isWinRestart = "";//每天电脑是否自动重启  0否  1是
         public static string isContinuousUpload = "";//是否开启连续上传， 0否  1是。【设备默认是每次采集完毕之后进行图像上传以及每天05:00、12:00、22:00进行数据补漏上传，我们将其称之为上传方案1】，开启连续上传之后，方案1即失效，连续上传是按照每次间隔用户设定的检索间隔进行检索上传，假如用户设定的检索间隔为60分钟，则每隔60分钟检索上传一次。
         public static string SearchInterval = "";//检索间隔 分钟 
+
+        #region 传输数据服务器
+        public static string IsTransfer = "0";//是否传输数据 0不传输 1传输
+        public static string TransferUploadIP = "";
+        public static string TransferUploadPort = "";
+        #endregion
+
         /// <summary>
         /// 读取配置文件参数
         /// </summary>
@@ -352,6 +359,10 @@ namespace BZ10
                 SearchInterval = Read_ConfigParam(configfileName, "Config", "SearchInterval");//连续上传检索间隔
                 if (SearchInterval == "")
                     SearchInterval = "60";
+                IsTransfer = Read_ConfigParam(configfileName, "Transfer", "IsTransfer");//0 不传输 1传输
+                TransferUploadIP = Read_ConfigParam(configfileName, "Transfer", "UploadIP");
+                TransferUploadPort = Read_ConfigParam(configfileName, "Transfer", "UploadPort");
+
                 initWorkTimeArray();
                 MainForm.updataConfigShow();
             }
