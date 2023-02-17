@@ -1974,9 +1974,9 @@ namespace BZ10
                                 }
                                 else if (msg1 == "0")
                                 {
-                                    Thread thread1 = new Thread(DevState);
+                                    Thread thread1 = new Thread(new ParameterizedThreadStart(DevState));
                                     thread1.IsBackground = true;
-                                    thread1.Start();
+                                    thread1.Start("0");
                                 }
                                 break;
                             case 127: //调整载物台 服务器→上位机(略)
@@ -1986,9 +1986,9 @@ namespace BZ10
                                 {
                                     tcpclient.Replay(128, "success", "");
                                     isDevRes = true;
-                                    Thread thread = new Thread(DevRes);
+                                    Thread thread = new Thread(new ParameterizedThreadStart(DevRes));
                                     thread.IsBackground = true;
-                                    thread.Start();
+                                    thread.Start("0");
                                 }
                                 break;
                             case 137: //推片 服务器→上位机
@@ -2052,9 +2052,9 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     tcpclient.Replay(141, "success", "");
-                                    Thread thread = new Thread(ResCard);
+                                    Thread thread = new Thread(new ParameterizedThreadStart(ResCard));
                                     thread.IsBackground = true;
-                                    thread.Start();
+                                    thread.Start("0");
                                 }
                                 else
                                     tcpclient.Replay(141, "fail", "只有调试模式下才可使用此功能");
@@ -2391,7 +2391,7 @@ namespace BZ10
                                     {
                                         statusInfo = "正常";
                                         locaiton = 13;
-                                        tcpclient.SendCurrAction(142, "", "回收");
+                                        transferClient.SendCurrAction(142, "", "回收");
                                         hideLocations();
                                         DevStartWork();
                                     }
@@ -2438,9 +2438,9 @@ namespace BZ10
                                 }
                                 else if (msg1 == "0")
                                 {
-                                    Thread thread1 = new Thread(DevState);
+                                    Thread thread1 = new Thread(new ParameterizedThreadStart(DevState));
                                     thread1.IsBackground = true;
-                                    thread1.Start();
+                                    thread1.Start("1");
                                 }
                                 break;
                             case 127: //调整载物台 服务器→上位机(略)
@@ -2450,9 +2450,9 @@ namespace BZ10
                                 {
                                     transferClient.Replay(128, "success", "");
                                     isDevRes = true;
-                                    Thread thread = new Thread(DevRes);
+                                    Thread thread = new Thread(new ParameterizedThreadStart(DevRes));
                                     thread.IsBackground = true;
-                                    thread.Start();
+                                    thread.Start("1");
                                 }
                                 break;
                             case 137: //推片 服务器→上位机
@@ -2516,9 +2516,9 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     transferClient.Replay(141, "success", "");
-                                    Thread thread = new Thread(ResCard);
+                                    Thread thread = new Thread(new ParameterizedThreadStart(ResCard));
                                     thread.IsBackground = true;
-                                    thread.Start();
+                                    thread.Start("1");
                                 }
                                 else
                                     transferClient.Replay(141, "fail", "只有调试模式下才可使用此功能");
@@ -2547,7 +2547,7 @@ namespace BZ10
         /// <summary>
         /// 回收片
         /// </summary>
-        private void ResCard()
+        private void ResCard(object tcpType)
         {
             setLocation(12);
             while (!isReady() && !bstop)
@@ -2561,7 +2561,15 @@ namespace BZ10
             ResetStatu();
             Thread.Sleep(110 * 1000);
             setLocation(0);
-            tcpclient.SendCurrAction(142, "", "原点");
+            if (tcpType + "" == "1")
+            {
+                transferClient.SendCurrAction(142, "", "原点");
+            }
+            else
+            {
+                tcpclient.SendCurrAction(142, "", "原点");
+            }
+
             locaiton = 1;
 
         }
@@ -2570,7 +2578,7 @@ namespace BZ10
         /// <summary>
         /// 设备状态切换
         /// </summary>
-        private void DevState()
+        private void DevState(object tcpType)
         {
             locaiton = 14;
             while (!isReady() && !bstop)
@@ -2587,7 +2595,15 @@ namespace BZ10
             Cmd.InitComm(serialPort1);
             ResetStatu();
             Thread.Sleep(110 * 1000);
-            tcpclient.SendCurrAction(142, "", "原点");
+            if (tcpType + "" == "1")
+            {
+                transferClient.SendCurrAction(142, "", "原点");
+            }
+            else
+            {
+                tcpclient.SendCurrAction(142, "", "原点");
+            }
+
             locaiton = 1;
         }
 
@@ -2682,7 +2698,7 @@ namespace BZ10
         /// <summary>
         /// 设备复位线程
         /// </summary>
-        private void DevRes()
+        private void DevRes(object tcpType)
         {
             while (!isReady() && !bstop)
             {
@@ -2713,7 +2729,14 @@ namespace BZ10
             hideLocations();
             DevStopWork();
             Thread.Sleep(100 * 1000);
-            tcpclient.SendCurrAction(142, "", "原点");
+            if (tcpType + "" == "1")
+            {
+                transferClient.SendCurrAction(142, "", "原点");
+            }
+            else
+            {
+                tcpclient.SendCurrAction(142, "", "原点");
+            }
             locaiton = 1;
             isDevRes = false;
         }

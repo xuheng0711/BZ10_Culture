@@ -510,6 +510,22 @@ namespace BZ10
             }
 
         }
+
+        /// <summary>
+        /// 发送当前动作
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="err"></param>
+        /// <param name="active"></param>
+        public void SendCurrAction(int func, string err, string active)
+        {
+            CurrActive currActive = new CurrActive();
+            currActive.func = func;
+            currActive.err = err;
+            currActive.devId = global.devid;
+            currActive.message = active;
+            SendMsg(currActive.ObjectToJson());
+        }
         /// <summary>
         /// 关闭Socket
         /// </summary>
@@ -601,7 +617,18 @@ namespace BZ10
         public int workMode { set; get; }
         public float temp { set; get; }
     }
-
+    class CurrActive
+    {
+        public int func { set; get; }
+        public string err { set; get; }
+        public string devId { set; get; }
+        public string message { set; get; }//0.原点 1.推片 2.滴加粘附液 3.收集 4.滴加培养液 5.回收 6.复位
+        public string ObjectToJson()
+        {
+            JavaScriptSerializer jsonSerialize = new JavaScriptSerializer();
+            return jsonSerialize.Serialize(this);
+        }
+    }
     class worktimes
     {
         public string devId { set; get; }
