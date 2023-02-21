@@ -1025,7 +1025,7 @@ namespace BZ10
                             #endregion
 
                         }
-                        else
+                        else if (Param.NetworkCommunication == "1")
                         {
                             bool isSuccess = httpRequest.SendPicMsg(dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo), path);
                             if (!isSuccess)
@@ -1033,6 +1033,51 @@ namespace BZ10
                                 DebOutPut.DebLog("图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
                                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
                                 break;
+                            }
+                            else
+                            {
+                                DebOutPut.DebLog("数据发送失败,发送数据条件不满足！");
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "数据发送失败,发送数据条件不满足！");
+                            }
+                        }
+                        else if (Param.NetworkCommunication == "2")
+                        {
+                            //mqtt传输方式
+                            if (mqttClient != null && mqttClient.client != null && mqttClient.client.IsConnected)
+                            {
+                                bool isSuccess = mqttClient.SendPicMsg(dt.ToString(Param.dataType, System.Globalization.DateTimeFormatInfo.InvariantInfo), path);
+                                if (isSuccess)
+                                {
+                                    DateTime startTime = DateTime.Now;
+                                    bool isUpladResult = true;//本张图像服务器回应结果
+                                    while (!isUpladCom)
+                                    {
+                                        //这条采集数据发送5分钟之后仍然没有收到回应，就停止等待，终止本次发送
+                                        if (startTime.AddMinutes(5) < DateTime.Now)
+                                        {
+                                            isUpladResult = false;//代表本张图像上传失败
+                                            break;
+                                        }
+                                        Thread.Sleep(1000);
+                                    }
+                                    if (!isUpladResult)
+                                    {
+                                        DebOutPut.DebLog("传输数据图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
+                                        DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "图像 " + imageName + " 未收到回应，本次发送将被终止，图像路径为:  " + path);
+                                        break;
+                                    }
+                                    else if (isUpladResult)
+                                    {
+                                        DebOutPut.DebLog("传输数据图像 " + imageName + " 已收到回应，图像路径为:  " + path);
+                                        isUpladCom = false;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                DebOutPut.DebLog("MQTT数据发送失败,发送数据条件不满足！");
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "MQTT数据发送失败,发送数据条件不满足！");
                             }
                         }
                     }
@@ -5041,7 +5086,7 @@ namespace BZ10
                 }
                 else if (Param.NetworkCommunication == "2")//MQTT通讯
                 {
-                    //mqttClient.publishMessage();
+                    mqttClient.SendSlideGlassCount(134, "", int.Parse(Param.remain), currRunMode, (float)wd);
                 }
             }
             catch (Exception ex)
@@ -5108,25 +5153,21 @@ namespace BZ10
                         case 0: //已经到达原点位置，
                             DetectMemory();
                             setLocation(0);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "原点");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "原点");
+                                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "原点"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
                             }
                             inituipian();
                             break;
                         case 1://已经到达推片位置，推片就绪
                             setLocation(2);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "推片");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "推片");
+                                case "0": tcpclient.SendCurrAction(142, "", "推片"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "推片"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "推片"); break;
                             }
                             tuipian();
                             break;
@@ -5139,13 +5180,11 @@ namespace BZ10
                             break;
                         case 4://滴加粘附液
                             setLocation(4);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "粘附液");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "粘附液");
+                                case "0": tcpclient.SendCurrAction(142, "", "粘附液"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "粘附液"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "粘附液"); break;
                             }
                             jiafanshilin();
                             break;
@@ -5154,13 +5193,11 @@ namespace BZ10
                             break;
                         case 6:  //打开风机
                             setLocation(6);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "收集");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "收集");
+                                case "0": tcpclient.SendCurrAction(142, "", "收集"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "收集"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "收集"); break;
                             }
                             openFengji();
                             break;
@@ -5172,25 +5209,21 @@ namespace BZ10
                             break;
                         case 9://滴加培养液
                             setLocation(8);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "培养液");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "培养液");
+                                case "0": tcpclient.SendCurrAction(142, "", "培养液"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "培养液"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "培养液"); break;
                             }
                             peiyang();
                             break;
                         case 10://推片到拍照位置
                             setLocation(10);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "拍照");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "拍照");
+                                case "0": tcpclient.SendCurrAction(142, "", "拍照"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "拍照"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "拍照"); break;
                             }
                             tuipaizhao();
                             break;
@@ -5202,13 +5235,11 @@ namespace BZ10
                             break;
                         case 12://回归原点
                             setLocation(12);
-                            if (Param.NetworkCommunication == "0")//Socket通讯方式
+                            switch (Param.NetworkCommunication)
                             {
-                                tcpclient.SendCurrAction(142, "", "回收");
-                            }
-                            else
-                            {
-                                httpRequest.sendDeviceStatus(142, "", "回收");
+                                case "0": tcpclient.SendCurrAction(142, "", "回收"); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "回收"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "回收"); break;
                             }
                             finish();
                             break;
@@ -5649,13 +5680,11 @@ namespace BZ10
                     startTimer1Time = DateTime.Now;
                     timer1.Start();
                 }
-                if (Param.NetworkCommunication == "0")//Socket通讯方式
+                switch (Param.NetworkCommunication)
                 {
-                    tcpclient.SendCurrAction(142, "", "拍照");
-                }
-                else
-                {
-                    httpRequest.sendDeviceStatus(142, "", "拍照");
+                    case "0": tcpclient.SendCurrAction(142, "", "拍照"); break;
+                    case "1": httpRequest.sendDeviceStatus(142, "", "拍照"); break;
+                    case "2": mqttClient.SendCurrAction(142, "", "拍照"); break;
                 }
             }
             catch (Exception ex)
@@ -8680,10 +8709,16 @@ namespace BZ10
                         lat = dlat;
                         lon = dlon;
                         serialPort2.Close();
+
                         if (Param.NetworkCommunication == "0")
                         {
                             if (tcpclient != null)
                                 tcpclient.sendLocation(dlat, dlon);
+                        }
+                        else if (Param.NetworkCommunication == "2")
+                        {
+                            if (mqttClient != null)
+                                mqttClient.sendLocation(dlat, dlon);
                         }
 
                     }
@@ -9244,6 +9279,10 @@ namespace BZ10
                 if (Param.NetworkCommunication == "0")
                 {
                     tcpclient.SendSlideGlassCount(134, "", remain1, currRunMode, (float)wd);
+                }
+                else if (Param.NetworkCommunication == "2")
+                {
+                    mqttClient.SendSlideGlassCount(134, "", remain1, currRunMode, (float)wd);
                 }
                 Thread.Sleep(1000);
             }

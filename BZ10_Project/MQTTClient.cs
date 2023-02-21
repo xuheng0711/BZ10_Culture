@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,8 +16,7 @@ namespace BZ10
     {
 
         private static MainForm form;//主界面对话框
-        MQTTModel mQTTModel = null;
-
+        MQTTModel mQTTModel = null;//MQTT对象
         /// <summary>
         /// 订阅主题
         /// </summary>
@@ -379,6 +379,29 @@ namespace BZ10
         }
 
         /// <summary>
+        /// 发送位置信息
+        /// </summary>
+        /// <param name="lat"></param>
+        /// <param name="lon"></param>
+        public void sendLocation(double lat, double lon)
+        {
+            try
+            {
+                LocationMsg location = new LocationMsg();
+                location.devId = Param.DeviceID;
+                location.func = 102;
+                location.err = "";
+                location.message.lat = lat;
+                location.message.lon = lon;
+                publishMessage(location.ObjectToJson());
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
+        /// <summary>
         /// 回应状态
         /// </summary>
         /// <param name="replay"></param>
@@ -419,6 +442,39 @@ namespace BZ10
             currActive.message = active;
             publishMessage(currActive.ObjectToJson());
         }
+
+        /// <summary>
+        /// 发送图像信息
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool SendPicMsg(string time, string path)
+        {
+            try
+            {
+                string strDeviceID = Param.DeviceID;
+
+                InfoPicMsg infopic = new InfoPicMsg();
+                infopic.devId = strDeviceID;
+                infopic.devtype = 2;
+                infopic.func = 101;
+                infopic.err = "";
+                picMsg pic = new picMsg();
+                pic.collectTime = time;
+                pic.picStr = "";//上传OSS地址
+                infopic.message = pic;
+                publishMessage(infopic.ObjectToJson());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+                return false;
+            }
+
+        }
         #endregion
 
         /// <summary>
@@ -437,6 +493,7 @@ namespace BZ10
                 }
             }
         }
+
 
 
     }
