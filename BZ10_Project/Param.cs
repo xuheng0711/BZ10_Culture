@@ -42,7 +42,7 @@ namespace BZ10
         public static string CollectHour = "";
         public static string CollectMinute = "";
         //通讯模式
-        public static string NetworkCommunication = "0";
+        public static string NetworkCommunication = "";//0:Socket 1:Http  2:MQTT
         //设备运行标记
         public static string RunFlag = "";
         //串口端口号
@@ -153,6 +153,14 @@ namespace BZ10
         public static string TransferUploadPort = "";
         #endregion
 
+        #region MQTT服务器
+        public static string MQTTAddress = "";
+        public static string MQTTPort = "";
+        public static string MQTTClientID = "";
+        public static string MQTTAccount = "";
+        public static string MQTTPassword = "";
+        #endregion
+
         /// <summary>
         /// 读取配置文件参数
         /// </summary>
@@ -219,6 +227,10 @@ namespace BZ10
                     SerialPortCamera = ComValue;
                 }
                 NetworkCommunication = Read_ConfigParam(configfileName, "Config", "NetworkCommunication");//通讯方式
+                if (NetworkCommunication == "")
+                { 
+                    NetworkCommunication = "0";
+                }
                 RunFlag = Read_ConfigParam(configfileName, "Config", "RunFlag");//运行模式
                 FanMinutes = Read_ConfigParam(configfileName, "Config", "FanMinutes");//采集时间
                 FanStrength = Read_ConfigParam(configfileName, "Config", "FanStrength");//采集强度
@@ -363,6 +375,11 @@ namespace BZ10
                 TransferUploadIP = Read_ConfigParam(configfileName, "Transfer", "UploadIP");
                 TransferUploadPort = Read_ConfigParam(configfileName, "Transfer", "UploadPort");
 
+                MQTTAddress = Read_ConfigParam(configfileName, "MQTT", "Address");
+                MQTTPort = Read_ConfigParam(configfileName, "MQTT", "Port");
+                MQTTClientID = Read_ConfigParam(configfileName, "MQTT", "ClientID");
+                MQTTAccount = Read_ConfigParam(configfileName, "MQTT", "Account");
+                MQTTPassword = Read_ConfigParam(configfileName, "MQTT", "Password");
                 initWorkTimeArray();
                 MainForm.updataConfigShow();
             }

@@ -137,6 +137,7 @@ namespace BZ10
         //private String StatusInfo = "正常";
         public TcpClient tcpclient = null;
         public TransferClient transferClient = null;//数据传输服务器
+        public MQTTClient mqttClient = null;//MQTT服务器
         private HttpRequest httpRequest = null;
         private bool _reconnection = true;
         GlobalParam global = new GlobalParam();
@@ -477,10 +478,16 @@ namespace BZ10
                     myThread.IsBackground = true;
                     myThread.Start();
                 }
-                else
+                else if (Param.NetworkCommunication == "1")//Http方式
                 {
                     httpRequest = new HttpRequest();
                     httpRequest.deviceId = Param.DeviceID;
+                }
+                else if (Param.NetworkCommunication == "2")//MQTT
+                {
+                    Thread myThread = new Thread(new ThreadStart(MQTTServerInit));
+                    myThread.IsBackground = true;
+                    myThread.Start();
                 }
                 //RunFlag 0:自动运行 1:定时运行  2:分时运行 
                 if (Param.RunFlag == "0")
@@ -846,6 +853,47 @@ namespace BZ10
             }
         }
 
+        /// <summary>
+        /// MQTT服务器初始化
+        /// </summary>
+        public void MQTTServerInit()
+        {
+            try
+            {
+                DebOutPut.DebLog("首次连接MQTT服务器！");
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "首次连接MQTT服务器！");
+
+                MQTTModel mQTTModel = new MQTTModel()
+                {
+                    Address = Param.MQTTAddress,
+                    Port = Param.MQTTPort,
+                    ClientID = Param.MQTTClientID,
+                    Account = Param.MQTTAccount,
+                    Password = Param.MQTTPassword
+                };
+
+                mqttClient = new MQTTClient(this, mQTTModel);
+                mqttClient.BuildMqttClient();//实例化MQTT客户端
+                mqttClient.MqttConnect();//连接服务器
+
+                if (mqttClient.client.IsConnected)
+                {
+                    LocationMsg location = new LocationMsg();
+                    location.devId = Param.DeviceID;
+                    location.func = 102;
+                    location.err = "";
+                    location.message.lat = lat;
+                    location.message.lon = lon;
+                    mqttClient.publishMessage(JsonConvert.SerializeObject(location));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
 
         //本次上传图像是否成功
         bool isUpladCom = false;
@@ -2545,6 +2593,497 @@ namespace BZ10
         }
 
         /// <summary>
+        /// 处理MQTT服务器数据
+        /// </summary>
+        /// <param name="jsonText"></param>
+        public void dealMQTTMsg(string jsonText)
+        {
+            lock (SequenceLockdealMsg)
+            {
+                int func = -1;
+                string collectTime = "";
+                try
+                {
+                    if (jsonText != "")
+                    {
+                        JObject jo = (JObject)JsonConvert.DeserializeObject(jsonText);
+                        if (jo.Property("devId") == null || jo.Property("devId").ToString() == "" || Param.DeviceID != jo["devId"].ToString() || jo.Property("func") == null || jo.Property("func").ToString() == "")
+                        {
+                            DebOutPut.DebLog("MQTT事件_接收到的数据不合法！数据：" + jsonText);
+                            DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "MQTT事件_接收到的数据不合法！数据：" + jsonText);
+                            return;
+                        }
+                        func = Convert.ToInt16(jo["func"].ToString());
+                        if (func == 100)
+                            DebOutPut.WriteLog(LogType.Normal, LogDetailedType.KeepAliveLog, "MQTT事件_接收:" + jsonText);
+                        else
+                            DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "MQTT事件_接收:" + jsonText);
+                        DebOutPut.DebLog("MQTT事件_接收:" + jsonText);
+                        switch (func)
+                        {
+                            case 100://连接保持帧头回应
+                                     //tcpclient.sendKeepLive();
+                                break;
+                            case 101: //发送采集信息 上位机→服务器
+                                DebOutPut.DebLog("发送采集信息收到回应，指令:101");
+                                collectTime = Convert.ToString(jo["collectTime"].ToString());
+                                collectTime = "update Record Set Flag = '1' where CollectTime='" + collectTime + "'";
+                                int x = DB.updateDatabase(collectTime);
+                                if (x != -1)
+                                {
+                                    isUpladCom = true;
+                                }
+                                else
+                                {
+                                    isUpladCom = false;
+                                    DebOutPut.DebLog("收到采集信息上传回复，但数据库标志位更改失败！");
+                                    DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "收到采集信息上传回复，但数据库标志位更改失败！");
+                                }
+                                break;
+                            case 102: //发送位置信息 上位机→服务器
+                                      //DebOutPut.DebLog( "发送位置信息收到回应，指令:102");
+                                break;
+                            case 130: //发送实时图像信息  上位机→服务器（略）
+                                      //Debug.WriteLine("实时图像上传成功！");
+                                break;
+                            case 134: //设置载玻片数量和当前工作模式 上位机→服务器
+                                      //DebOutPut.DebLog( "发送载玻片数量和当前工作模式收到回应，指令:134");
+                                break;
+                            case 110: //获取设备参数 服务器→上位机
+                                int isbug = -1;
+                                if (cb_switch.Checked == false)
+                                    isbug = 0;
+                                else if (cb_switch.Checked == true)
+                                    isbug = 1;
+                                mqttClient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), isbug);
+                                break;
+                            case 111: //获取设备当前状态和当前动作 服务器→上位机
+                                string position = "";
+                                switch (locaiton)
+                                {
+                                    case 1:
+                                        position = "原点";
+                                        break;
+                                    case 3:
+                                        position = "推片";
+                                        break;
+                                    case 5:
+                                        position = "粘附液";
+                                        break;
+                                    case 7:
+                                        position = "收集";
+                                        break;
+                                    case 9:
+                                        position = "培养液";
+                                        break;
+                                    case 11:
+                                        position = "拍照";
+                                        break;
+                                    case 13:
+                                        position = "回收";
+                                        break;
+                                    case 14:
+                                        position = "复位";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (position == "")
+                                    position = "等待";
+                                mqttClient.senddevStatus(111, "", statusInfo, position);
+                                DebOutPut.DebLog("同步载破片数量和工作模式");
+                                int remain1 = int.Parse(this.TxtRemain.Text.Trim());//载玻片数量
+                                if (remain1 < 0)
+                                    remain1 = 0;
+                                int currRunMode1 = this.TxtRunMode.SelectedIndex;//当前工作模式
+                                mqttClient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
+                                break;
+                            case 135: //获取工作时段 服务器→上位机
+                                string temp;
+                                String time1 = "[{ \"time1\":\"" + Param.work1 + "\"},";
+                                String time2 = "{ \"time2\":\"" + Param.work2 + "\"},";
+                                String time3 = "{ \"time3\":\"" + Param.work3 + "\"},";
+                                String time4 = "{ \"time4\":\"" + Param.work4 + "\"},";
+                                String time5 = "{ \"time5\":\"" + Param.work5 + "\"}]";
+                                temp = time1 + time2 + time3 + time4 + time5;
+                                mqttClient.sendtimeControl(135, "", temp);
+                                break;
+                            case 136://获取当前工作模式 服务器→上位机
+                                mqttClient.sendWorkMode(Param.RunFlag);
+                                break;
+                            case 123: //设置设备参数 服务器→上位机
+                                string mess = jo["message"].ToString();
+                                jo = (JObject)JsonConvert.DeserializeObject(mess);
+                                if (jo.Property("collectHour") != null && jo.Property("collectHour").ToString() != "")
+                                {
+                                    string hour = jo["collectHour"].ToString();
+                                    if (hour != null && hour != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "CollectHour", hour);
+                                }
+                                if (jo.Property("collectTime") != null && jo.Property("collectTime").ToString() != "")
+                                {
+                                    string minute = jo["collectTime"].ToString();
+                                    if (minute != null && minute != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "CollectMinute", minute);
+                                }
+                                if (jo.Property("sampleMinutes") != null && jo.Property("sampleMinutes").ToString() != "")
+                                {
+                                    string sampleMinutes = jo["sampleMinutes"].ToString();
+                                    if (sampleMinutes != null && sampleMinutes != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "FanMinutes", sampleMinutes);
+                                }
+                                if (jo.Property("sampleStrenth") != null && jo.Property("sampleStrenth").ToString() != "")
+                                {
+                                    string sampleStrenth = jo["sampleStrenth"].ToString();
+                                    if (sampleStrenth != null && sampleStrenth != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "FanStrength", sampleStrenth);
+                                }
+                                if (jo.Property("cultureCount") != null && jo.Property("cultureCount").ToString() != "")
+                                {
+                                    string cultureCount = jo["cultureCount"].ToString();
+                                    if (cultureCount != null && cultureCount != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "peiyangye", cultureCount);
+                                }
+                                if (jo.Property("VaselineCount") != null && jo.Property("VaselineCount").ToString() != "")
+                                {
+                                    string VaselineCount = jo["VaselineCount"].ToString();
+                                    if (VaselineCount != null && VaselineCount != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "fanshilin", VaselineCount);
+                                }
+                                if (jo.Property("cultureTime") != null && jo.Property("cultureTime").ToString() != "")
+                                {
+                                    string cultureTime = jo["cultureTime"].ToString();
+                                    if (cultureTime != null && cultureTime != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "peiyangtime", cultureTime);
+                                }
+                                if (jo.Property("minSteps") != null && jo.Property("minSteps").ToString() != "")
+                                {
+                                    string minSteps = jo["minSteps"].ToString();
+                                    if (minSteps != null && minSteps != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "MinSteps", minSteps);
+                                }
+                                if (jo.Property("maxSteps") != null && jo.Property("maxSteps").ToString() != "")
+                                {
+                                    string maxSteps = jo["maxSteps"].ToString();
+                                    if (maxSteps != null && maxSteps != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "MaxSteps", maxSteps);
+                                }
+                                if (jo.Property("clearCount") != null && jo.Property("clearCount").ToString() != "")
+                                {
+                                    string clearCount = jo["clearCount"].ToString();
+                                    if (clearCount != null && clearCount != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "ClearCount", clearCount);
+                                }
+                                if (jo.Property("leftMaxSteps") != null && jo.Property("leftMaxSteps").ToString() != "")
+                                {
+                                    string leftMaxSteps = jo["leftMaxSteps"].ToString();
+                                    if (leftMaxSteps != null && leftMaxSteps != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "LeftMaxSteps", leftMaxSteps);
+                                }
+                                if (jo.Property("rightMaxSteps") != null && jo.Property("rightMaxSteps").ToString() != "")
+                                {
+                                    string rightMaxSteps = jo["rightMaxSteps"].ToString();
+                                    if (rightMaxSteps != null && rightMaxSteps != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "RightMaxSteps", rightMaxSteps);
+                                }
+                                if (jo.Property("liftRightClearCount") != null && jo.Property("liftRightClearCount").ToString() != "")
+                                {
+                                    string liftRightClearCount = jo["liftRightClearCount"].ToString();
+                                    if (liftRightClearCount != null && liftRightClearCount != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "LiftRightClearCount", liftRightClearCount);
+                                }
+                                if (jo.Property("liftRightMoveInterval") != null && jo.Property("liftRightMoveInterval").ToString() != "")
+                                {
+                                    string liftRightMoveInterval = jo["liftRightMoveInterval"].ToString();
+                                    if (liftRightMoveInterval != null && liftRightMoveInterval != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "LiftRightMoveInterval", liftRightMoveInterval);
+                                }
+                                if (jo.Property("fanStrengthMax") != null && jo.Property("fanStrengthMax").ToString() != "")
+                                {
+                                    string fanStrengthMax = jo["fanStrengthMax"].ToString();
+                                    if (fanStrengthMax != null && fanStrengthMax != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "FanStrengthMax", fanStrengthMax);
+                                }
+                                if (jo.Property("fanStrengthMin") != null && jo.Property("fanStrengthMin").ToString() != "")
+                                {
+                                    string fanStrengthMin = jo["fanStrengthMin"].ToString();
+                                    if (fanStrengthMin != null && fanStrengthMin != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "FanStrengthMin", fanStrengthMin);
+                                }
+                                if (jo.Property("tranStepsMin") != null && jo.Property("tranStepsMin").ToString() != "")
+                                {
+                                    string tranStepsMin = jo["tranStepsMin"].ToString();
+                                    if (tranStepsMin != null && tranStepsMin != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "tranStepsMin", tranStepsMin);
+                                }
+                                if (jo.Property("tranStepsMax") != null && jo.Property("tranStepsMax").ToString() != "")
+                                {
+                                    string tranStepsMax = jo["tranStepsMax"].ToString();
+                                    if (tranStepsMax != null && tranStepsMax != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "tranStepsMax", tranStepsMax);
+                                }
+                                if (jo.Property("tranClearCount") != null && jo.Property("tranClearCount").ToString() != "")
+                                {
+                                    string tranClearCount = jo["tranClearCount"].ToString();
+                                    if (tranClearCount != null && tranClearCount != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "tranClearCount", tranClearCount);
+                                }
+                                if (jo.Property("xCorrecting") != null && jo.Property("xCorrecting").ToString() != "")
+                                {
+                                    string xCorrecting = jo["xCorrecting"].ToString();
+                                    if (xCorrecting != null && xCorrecting != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "XCorrecting", xCorrecting);
+                                }
+                                if (jo.Property("yCorrecting") != null && jo.Property("yCorrecting").ToString() != "")
+                                {
+                                    string yCorrecting = jo["yCorrecting"].ToString();
+                                    if (yCorrecting != null && yCorrecting != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YCorrecting", yCorrecting);
+                                }
+                                if (jo.Property("yJustRange") != null && jo.Property("yJustRange").ToString() != "")
+                                {
+                                    string yJustRange = jo["yJustRange"].ToString();
+                                    if (yJustRange != null && yJustRange != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YJustRange", yJustRange);
+                                }
+                                if (jo.Property("yNegaRange") != null && jo.Property("yNegaRange").ToString() != "")
+                                {
+                                    string yNegaRange = jo["yNegaRange"].ToString();
+                                    if (yNegaRange != null && yNegaRange != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YNegaRange", yNegaRange);
+                                }
+                                if (jo.Property("yInterval") != null && jo.Property("yInterval").ToString() != "")
+                                {
+                                    string yInterval = jo["yInterval"].ToString();
+                                    if (yInterval != null && yInterval != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YInterval", yInterval);
+                                }
+                                if (jo.Property("yJustCom") != null && jo.Property("yJustCom").ToString() != "")
+                                {
+                                    string yJustCom = jo["yJustCom"].ToString();
+                                    if (yJustCom != null && yJustCom != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YJustCom", yJustCom);
+                                }
+                                if (jo.Property("yNageCom") != null && jo.Property("yNageCom").ToString() != "")
+                                {
+                                    string yNageCom = jo["yNageCom"].ToString();
+                                    if (yNageCom != null && yNageCom != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YNageCom", yNageCom);
+                                }
+                                if (jo.Property("yFirst") != null && jo.Property("yFirst").ToString() != "")
+                                {
+                                    string yFirst = jo["yFirst"].ToString();
+                                    if (yFirst != null && yFirst != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YFirst", yFirst);
+                                }
+                                if (jo.Property("yCheck") != null && jo.Property("yCheck").ToString() != "")
+                                {
+                                    string yCheck = jo["yCheck"].ToString();
+                                    if (yCheck != null && yCheck != "")
+                                        Param.Set_ConfigParm(configfileName, "Config", "YCheck", yCheck);
+                                }
+                                Param.Init_Param(configfileName);
+                                RefeshWindowLabel();
+                                mqttClient.Replay(123, "success", "");
+                                break;
+                            case 124: //工作模式切换：自动、定时、时段 服务器→上位机
+                                string msg = jo["message"].ToString();
+                                jo = (JObject)JsonConvert.DeserializeObject(msg);
+                                string mode = jo["workmode"].ToString();
+                                mqttClient.Replay(124, "success", "");
+                                Param.Set_ConfigParm(configfileName, "Config", "RunFlag", mode);
+                                DevStopWork();
+                                DevStartWork();
+
+                                DebOutPut.DebLog("同步载破片数量和工作模式");
+                                int remain = int.Parse(this.TxtRemain.Text.Trim());//载玻片数量
+                                if (remain < 0)
+                                    remain = 0;
+                                int currRunMode = this.TxtRunMode.SelectedIndex;//当前工作模式
+                                mqttClient.SendSlideGlassCount(134, "", remain, currRunMode, (float)wd);
+                                break;
+                            case 129: //远程重启设备  服务器→上位机
+                                mqttClient.Replay(129, "success", "");
+                                Tools.RestStart();
+                                break;
+                            case 131: //远程开关设备  服务器→上位机
+                                string mess1 = jo["message"].ToString();
+                                mqttClient.Replay(131, "success", "");
+                                if (mess1.ToUpper() == "ON")
+                                {
+                                    if (!devIsStart)
+                                    {
+                                        statusInfo = "正常";
+                                        locaiton = 13;
+                                        mqttClient.SendCurrAction(142, "", "回收");
+                                        hideLocations();
+                                        DevStartWork();
+                                    }
+                                }
+                                else if (mess1.ToUpper() == "OFF")
+                                {
+                                    if (devIsStart)
+                                    {
+                                        statusInfo = "关机";
+                                        hideLocations();
+                                        DevStopWork();
+                                    }
+                                }
+                                break;
+                            case 133: //设置工作时段 服务器→上位机
+                                string msgg = jo["message"].ToString();
+                                int a = msgg.IndexOf(':');
+                                string str1 = msgg.Substring(0, a + 1);
+                                int b = msgg.IndexOf('[');
+                                int c = msgg.IndexOf(']');
+                                string str2 = msgg.Substring(b);
+                                int d = str2.IndexOf(']');
+                                string str3 = str2.Substring(0, d + 1);
+                                string str4 = str2.Substring(str2.Length - 1);
+                                string strz = str1 + str3 + str4;//去掉了转义字符之后的
+                                TimeRoot root1 = new TimeRoot();
+                                root1 = JsonConvert.DeserializeObject<TimeRoot>(strz);
+                                while (root1.timecontrol.Count < 5)
+                                    root1.timecontrol.Add("00:00-00:00");
+                                writeWorktime(root1.timecontrol);
+                                mqttClient.Replay(133, "success", "");
+                                break;
+                            /*
+                             * 远程调试模式下
+                             */
+                            case 143: //设备状态切换：正常、调试 服务器→上位机
+                                string msg1 = jo["message"].ToString();
+                                mqttClient.Replay(143, "success", "");
+                                if (msg1 == "1")
+                                {
+                                    NormalMode();
+                                    this.cb_switch.Checked = false;
+                                    isLongRangeDebug = false;
+                                }
+                                else if (msg1 == "0")
+                                {
+                                    Thread thread1 = new Thread(new ParameterizedThreadStart(DevState));
+                                    thread1.IsBackground = true;
+                                    thread1.Start("2");
+                                }
+                                break;
+                            case 127: //调整载物台 服务器→上位机(略)
+                                break;
+                            case 128: //设备复位  服务器→上位机
+                                if (isDevRes == false)
+                                {
+                                    mqttClient.Replay(128, "success", "");
+                                    isDevRes = true;
+                                    Thread thread = new Thread(new ParameterizedThreadStart(DevRes));
+                                    thread.IsBackground = true;
+                                    thread.Start("2");
+                                }
+                                break;
+                            case 137: //推片 服务器→上位机
+
+                                if (cb_switch.Checked)
+                                {
+                                    if (label21.Text == "存在")
+                                    {
+                                        mqttClient.Replay(137, "fail", "载玻片已存在");
+                                    }
+                                    else
+                                    {
+                                        mqttClient.Replay(137, "success", "");
+                                        bstop = false;
+                                        setLocation(2);
+                                        inituipian();
+                                    }
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(137, "fail", "只有调试模式下才可使用此功能");
+                                }
+                                break;
+                            case 138: //滴加粘附液 服务器→上位机
+                                if (cb_switch.Checked)
+                                {
+                                    mqttClient.Replay(138, "success", "");
+                                    setLocation(4);
+                                    tuifanshilin();
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(138, "fail", "只有调试模式下才可使用此功能");
+                                }
+                                break;
+                            case 139: //收集 服务器→上位机
+                                if (cb_switch.Checked)
+                                {
+                                    mqttClient.Replay(139, "success", "");
+                                    setLocation(6);
+                                    tuipianFengshan();
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(139, "fail", "只有调试模式下才可使用此功能");
+                                }
+                                break;
+                            case 140: //滴加培养液 服务器→上位机
+                                if (cb_switch.Checked)
+                                {
+                                    mqttClient.Replay(140, "success", "");
+                                    setLocation(8);
+                                    tuiPeiyangye();
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(140, "fail", "只有调试模式下才可使用此功能");
+                                }
+                                break;
+                            case 126: //拍照  服务器→上位机
+                                if (cb_switch.Checked)
+                                {
+                                    mqttClient.Replay(126, "success", "开始拍照");
+                                    setLocation(10);
+                                    tuipaizhao();
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(126, "fail", "只有调试模式下才可使用此功能");
+                                }
+
+                                break;
+                            case 141: //回收载玻片 服务器→上位机
+                                if (cb_switch.Checked)
+                                {
+                                    mqttClient.Replay(141, "success", "");
+                                    Thread thread = new Thread(new ParameterizedThreadStart(ResCard));
+                                    thread.IsBackground = true;
+                                    thread.Start("2");
+                                }
+                                else
+                                {
+                                    mqttClient.Replay(141, "fail", "只有调试模式下才可使用此功能");
+                                }
+                                break;
+                            case 142://当前动作 服务器→上位机
+                                break;
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (func == -1)
+                    {
+                        DebOutPut.DebLog("MQTT事件_接收到的数据不合法！接收数据：" + jsonText + "\r\n错误信息：" + ex.ToString());
+                        DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "MQTT事件_接收到的数据不合法！接收数据：" + jsonText + "\r\n错误信息：" + ex.ToString());
+                    }
+                    else
+                    {
+                        DebOutPut.DebLog("功能码：" + func + " Err！\r\nMQTT接收数据：" + jsonText + "\r\n错误信息：" + ex.ToString());
+                        DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "功能码：" + func + " Err！\r\nMQTT接收数据：" + jsonText + "\r\n错误信息：" + ex.ToString());
+                    }
+                }
+            }
+        }
+        /// <summary>
         /// 回收片
         /// </summary>
         private void ResCard(object tcpType)
@@ -2561,13 +3100,12 @@ namespace BZ10
             ResetStatu();
             Thread.Sleep(110 * 1000);
             setLocation(0);
-            if (tcpType + "" == "1")
+
+            switch (tcpType + "")
             {
-                transferClient.SendCurrAction(142, "", "原点");
-            }
-            else
-            {
-                tcpclient.SendCurrAction(142, "", "原点");
+                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
             }
 
             locaiton = 1;
@@ -2595,15 +3133,13 @@ namespace BZ10
             Cmd.InitComm(serialPort1);
             ResetStatu();
             Thread.Sleep(110 * 1000);
-            if (tcpType + "" == "1")
-            {
-                transferClient.SendCurrAction(142, "", "原点");
-            }
-            else
-            {
-                tcpclient.SendCurrAction(142, "", "原点");
-            }
 
+            switch (tcpType + "")
+            {
+                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
+            }
             locaiton = 1;
         }
 
@@ -2729,13 +3265,11 @@ namespace BZ10
             hideLocations();
             DevStopWork();
             Thread.Sleep(100 * 1000);
-            if (tcpType + "" == "1")
+            switch (tcpType + "")
             {
-                transferClient.SendCurrAction(142, "", "原点");
-            }
-            else
-            {
-                tcpclient.SendCurrAction(142, "", "原点");
+                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
             }
             locaiton = 1;
             isDevRes = false;
@@ -4504,6 +5038,10 @@ namespace BZ10
                 if (Param.NetworkCommunication == "0")//Socket通讯方式
                 {
                     tcpclient.SendSlideGlassCount(134, "", int.Parse(Param.remain), currRunMode, (float)wd);
+                }
+                else if (Param.NetworkCommunication == "2")//MQTT通讯
+                {
+                    //mqttClient.publishMessage();
                 }
             }
             catch (Exception ex)
@@ -8537,7 +9075,10 @@ namespace BZ10
             this.txt_Hour.Text = Param.CollectHour;
             this.txt_Mins.Text = Param.CollectMinute;
             this.TxtDevId.Text = Param.DeviceID;
-            this.cbNetworkCommunication.SelectedIndex = int.Parse(Param.NetworkCommunication);//通信方式
+
+            int nNetworkCommunication = 0;
+            int.TryParse(Param.NetworkCommunication, out nNetworkCommunication);
+            this.cbNetworkCommunication.SelectedIndex = nNetworkCommunication;//通信方式
             this.TxtRunMode.SelectedIndex = int.Parse(Param.RunFlag);
             this.TxtFanStartTime.Text = Param.FanMinutes;
             this.TxtFanStartStrength.Text = Param.FanStrength;
@@ -8854,6 +9395,10 @@ namespace BZ10
             else if (this.cbNetworkCommunication.SelectedItem + "" == "Http")
             {
                 NetworkCommunication = "1";
+            }
+            else if (this.cbNetworkCommunication.SelectedItem + "" == "MQTT")
+            {
+                NetworkCommunication = "2";
             }
             Param.Set_ConfigParm(configfileName, "Config", "NetworkCommunication", NetworkCommunication);
             Param.Set_ConfigParm(configfileName, "Config", "FanMinutes", this.TxtFanStartTime.Text);

@@ -2210,7 +2210,8 @@ namespace BZ10
             this.cbNetworkCommunication.FormattingEnabled = true;
             this.cbNetworkCommunication.Items.AddRange(new object[] {
             "Socket",
-            "Http"});
+            "Http",
+            "MQTT"});
             this.cbNetworkCommunication.Location = new System.Drawing.Point(92, 215);
             this.cbNetworkCommunication.Name = "cbNetworkCommunication";
             this.cbNetworkCommunication.Size = new System.Drawing.Size(81, 26);
