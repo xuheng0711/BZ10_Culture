@@ -462,7 +462,7 @@ namespace BZ10
                 infopic.err = "";
                 picMsg pic = new picMsg();
                 pic.collectTime = time;
-                pic.picStr = "";//上传OSS地址
+                pic.picStr = Tools.GetBase64FromPic(path);//base64图像
                 infopic.message = pic;
                 publishMessage(infopic.ObjectToJson());
                 return true;

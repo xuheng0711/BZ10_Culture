@@ -878,13 +878,7 @@ namespace BZ10
 
                 if (mqttClient.client.IsConnected)
                 {
-                    LocationMsg location = new LocationMsg();
-                    location.devId = Param.DeviceID;
-                    location.func = 102;
-                    location.err = "";
-                    location.message.lat = lat;
-                    location.message.lon = lon;
-                    mqttClient.publishMessage(JsonConvert.SerializeObject(location));
+                    mqttClient.sendLocation(lat,lon);
                 }
 
             }
