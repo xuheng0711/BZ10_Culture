@@ -39,10 +39,10 @@
             this.button2 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label24 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.button5 = new System.Windows.Forms.Button();
@@ -92,9 +92,9 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label36 = new System.Windows.Forms.Label();
-            this.label37 = new System.Windows.Forms.Label();
+            this.lb_X17 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
-            this.label35 = new System.Windows.Forms.Label();
+            this.lb_X16 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.lb_X15 = new System.Windows.Forms.Label();
             this.button16 = new System.Windows.Forms.Button();
@@ -132,10 +132,10 @@
             this.richTex = new System.Windows.Forms.RichTextBox();
             this.button34 = new System.Windows.Forms.Button();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
+            this.comboBox6 = new System.Windows.Forms.ComboBox();
             this.comboBox5 = new System.Windows.Forms.ComboBox();
             this.label28 = new System.Windows.Forms.Label();
             this.button35 = new System.Windows.Forms.Button();
-            this.comboBox6 = new System.Windows.Forms.ComboBox();
             this.label30 = new System.Windows.Forms.Label();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.button36 = new System.Windows.Forms.Button();
@@ -284,6 +284,16 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "主控串口";
             // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(47, 30);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(58, 22);
+            this.comboBox1.TabIndex = 1;
+            // 
             // comboBox2
             // 
             this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -324,16 +334,6 @@
             this.button1.Text = "打开";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(47, 30);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(58, 22);
-            this.comboBox1.TabIndex = 1;
             // 
             // label2
             // 
@@ -867,9 +867,9 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.label36);
-            this.groupBox2.Controls.Add(this.label37);
+            this.groupBox2.Controls.Add(this.lb_X17);
             this.groupBox2.Controls.Add(this.label34);
-            this.groupBox2.Controls.Add(this.label35);
+            this.groupBox2.Controls.Add(this.lb_X16);
             this.groupBox2.Controls.Add(this.label26);
             this.groupBox2.Controls.Add(this.lb_X15);
             this.groupBox2.Controls.Add(this.button16);
@@ -920,15 +920,15 @@
             this.label36.TabIndex = 37;
             this.label36.Text = "X17";
             // 
-            // label37
+            // lb_X17
             // 
-            this.label37.AutoSize = true;
-            this.label37.BackColor = System.Drawing.Color.Red;
-            this.label37.Location = new System.Drawing.Point(197, 120);
-            this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(24, 16);
-            this.label37.TabIndex = 36;
-            this.label37.Text = "  ";
+            this.lb_X17.AutoSize = true;
+            this.lb_X17.BackColor = System.Drawing.Color.Red;
+            this.lb_X17.Location = new System.Drawing.Point(197, 120);
+            this.lb_X17.Name = "lb_X17";
+            this.lb_X17.Size = new System.Drawing.Size(24, 16);
+            this.lb_X17.TabIndex = 36;
+            this.lb_X17.Text = "  ";
             // 
             // label34
             // 
@@ -940,15 +940,15 @@
             this.label34.TabIndex = 35;
             this.label34.Text = "X16";
             // 
-            // label35
+            // lb_X16
             // 
-            this.label35.AutoSize = true;
-            this.label35.BackColor = System.Drawing.Color.Red;
-            this.label35.Location = new System.Drawing.Point(157, 120);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(24, 16);
-            this.label35.TabIndex = 34;
-            this.label35.Text = "  ";
+            this.lb_X16.AutoSize = true;
+            this.lb_X16.BackColor = System.Drawing.Color.Red;
+            this.lb_X16.Location = new System.Drawing.Point(157, 120);
+            this.lb_X16.Name = "lb_X16";
+            this.lb_X16.Size = new System.Drawing.Size(24, 16);
+            this.lb_X16.TabIndex = 34;
+            this.lb_X16.Text = "  ";
             // 
             // label26
             // 
@@ -1327,6 +1327,16 @@
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "副控串口";
             // 
+            // comboBox6
+            // 
+            this.comboBox6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox6.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.comboBox6.FormattingEnabled = true;
+            this.comboBox6.Location = new System.Drawing.Point(47, 30);
+            this.comboBox6.Name = "comboBox6";
+            this.comboBox6.Size = new System.Drawing.Size(58, 22);
+            this.comboBox6.TabIndex = 1;
+            // 
             // comboBox5
             // 
             this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1367,16 +1377,6 @@
             this.button35.Text = "打开";
             this.button35.UseVisualStyleBackColor = true;
             this.button35.Click += new System.EventHandler(this.button35_Click);
-            // 
-            // comboBox6
-            // 
-            this.comboBox6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox6.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.comboBox6.FormattingEnabled = true;
-            this.comboBox6.Location = new System.Drawing.Point(47, 30);
-            this.comboBox6.Name = "comboBox6";
-            this.comboBox6.Size = new System.Drawing.Size(58, 22);
-            this.comboBox6.TabIndex = 1;
             // 
             // label30
             // 
@@ -1602,9 +1602,9 @@
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label36;
-        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.Label lb_X17;
         private System.Windows.Forms.Label label34;
-        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label lb_X16;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.Label lb_X15;
         private System.Windows.Forms.Button button16;

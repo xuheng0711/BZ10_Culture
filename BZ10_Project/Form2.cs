@@ -508,9 +508,9 @@ namespace BZ10
                     {
                         string stuta = PushingFluidRead();
                         if (stuta == "00")
-                            label37.BackColor = Color.Yellow;//17限位
+                            lb_X17.BackColor = Color.Yellow;//17限位
                         else if (stuta == "01")
-                            label37.BackColor = Color.Green;
+                            lb_X17.BackColor = Color.Green;
 
                     }
                 }
@@ -716,16 +716,16 @@ namespace BZ10
                 if (recContent == "01")//当前在右限位
                 {
                     this.lb_X15.BackColor = Color.Yellow;//限位15
-                    this.label35.BackColor = Color.Green;//限位16
+                    this.lb_X16.BackColor = Color.Green;//限位16
                 }
                 else if (recContent == "02")//以到达左限位
                 {
-                    this.label35.BackColor = Color.Yellow;
+                    this.lb_X16.BackColor = Color.Yellow;
                     this.lb_X15.BackColor = Color.Green;
                 }
                 else//可自由移动
                 {
-                    this.label35.BackColor = Color.Yellow;
+                    this.lb_X16.BackColor = Color.Yellow;
                     this.lb_X15.BackColor = Color.Yellow;
                 }
             }
