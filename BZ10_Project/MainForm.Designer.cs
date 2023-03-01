@@ -140,7 +140,7 @@ namespace BZ10
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label19 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label18 = new System.Windows.Forms.Label();
+            this.lblError = new System.Windows.Forms.Label();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.BtnClear = new System.Windows.Forms.Button();
@@ -1758,7 +1758,7 @@ namespace BZ10
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.label18);
+            this.groupBox4.Controls.Add(this.lblError);
             this.groupBox4.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox4.Location = new System.Drawing.Point(10, 215);
             this.groupBox4.Name = "groupBox4";
@@ -1767,15 +1767,15 @@ namespace BZ10
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "错误信息";
             // 
-            // label18
+            // lblError
             // 
-            this.label18.AutoSize = true;
-            this.label18.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label18.Location = new System.Drawing.Point(6, 25);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(56, 16);
-            this.label18.TabIndex = 0;
-            this.label18.Text = "无数据";
+            this.lblError.AutoSize = true;
+            this.lblError.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.lblError.Location = new System.Drawing.Point(6, 25);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(56, 16);
+            this.lblError.TabIndex = 0;
+            this.lblError.Text = "无数据";
             // 
             // tabPage1
             // 
@@ -3817,7 +3817,7 @@ namespace BZ10
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox12;
         private System.Windows.Forms.GroupBox groupBox11;

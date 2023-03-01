@@ -519,10 +519,10 @@ namespace BZ10
                 else
                 {
                     statusInfo = "数据库打开失败,请处理！";
-                    label18.Text = "数据库打开失败,请处理！";
+                    lblError.Text = "数据库打开失败,请处理！";
                     DebOutPut.DebLog("数据库打开失败");
                     DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "数据库打开失败");
-                    label18.ForeColor = System.Drawing.Color.Red;
+                    lblError.ForeColor = System.Drawing.Color.Red;
                 }
                 this.Show();
             }
@@ -680,10 +680,10 @@ namespace BZ10
                     {
                         DebOutPut.DebLog("启动相机成功！");
                         statusInfo = "正常";
-                        if (label18.Text.Contains("相机"))
+                        if (lblError.Text.Contains("相机"))
                         {
-                            label18.Text = "无数据";
-                            label18.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
+                            lblError.Text = "无数据";
+                            lblError.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
                         }
                         break;
                     }
@@ -696,16 +696,16 @@ namespace BZ10
                         cameraErrStr = "启动相机失败";
                     }
                     statusInfo = cameraErrStr;
-                    label18.Text = cameraErrStr + "，请处理！";
-                    label18.ForeColor = System.Drawing.Color.Red;
+                    lblError.Text = cameraErrStr + "，请处理！";
+                    lblError.ForeColor = System.Drawing.Color.Red;
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 statusInfo = "相机启动异常";
-                label18.Text = "相机启动异常，请处理！";
-                label18.ForeColor = System.Drawing.Color.Red;
+                lblError.Text = "相机启动异常，请处理！";
+                lblError.ForeColor = System.Drawing.Color.Red;
                 DebOutPut.DebLog("老相机启动异常：" + ex.ToString());
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "老相机启动异常：" + ex.ToString());
                 OldOnEventError();
@@ -735,10 +735,10 @@ namespace BZ10
                     {
                         DebOutPut.DebLog("启动相机成功！");
                         statusInfo = "正常";
-                        if (label18.Text.Contains("相机"))
+                        if (lblError.Text.Contains("相机"))
                         {
-                            label18.Text = "无数据";
-                            label18.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
+                            lblError.Text = "无数据";
+                            lblError.ForeColor = System.Drawing.Color.FromArgb(0, 0, 0);
                         }
                         break;
                     }
@@ -751,16 +751,16 @@ namespace BZ10
                         cameraErrStr = "启动相机失败";
                     }
                     statusInfo = cameraErrStr;
-                    label18.Text = cameraErrStr + "，请处理！";
-                    label18.ForeColor = System.Drawing.Color.Red;
+                    lblError.Text = cameraErrStr + "，请处理！";
+                    lblError.ForeColor = System.Drawing.Color.Red;
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 statusInfo = "相机启动异常";
-                label18.Text = "相机启动异常，请处理！";
-                label18.ForeColor = System.Drawing.Color.Red;
+                lblError.Text = "相机启动异常，请处理！";
+                lblError.ForeColor = System.Drawing.Color.Red;
                 DebOutPut.DebLog("新相机启动异常：" + ex.ToString());
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "新相机启动异常：" + ex.ToString());
                 CameraClose();
@@ -3599,8 +3599,8 @@ namespace BZ10
                 if (ret == null || ret[0] != 0xFF)
                 {
                     statusInfo = "初始化读取状态失败,请处理！";
-                    label18.Text = "初始化读取状态失败,请处理！";
-                    label18.ForeColor = System.Drawing.Color.Red;
+                    lblError.Text = "初始化读取状态失败,请处理！";
+                    lblError.ForeColor = System.Drawing.Color.Red;
                     DebOutPut.DebLog("初始化读取状态失败！");
                     DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "初始化读取状态失败！");
                     return;
@@ -3978,10 +3978,10 @@ namespace BZ10
             if (list.Distinct().Count<string>() != list.Count)//排查数组中是否有重复元素
             {
                 statusInfo = "串口配置错误,请处理！";
-                label18.Text = "串口配置错误,请处理！";
+                lblError.Text = "串口配置错误,请处理！";
                 DebOutPut.DebLog("串口配置错误");
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "串口配置错误");
-                label18.ForeColor = System.Drawing.Color.Red;
+                lblError.ForeColor = System.Drawing.Color.Red;
                 return false;
             }
             String[] Portname = SerialPort.GetPortNames();
@@ -4008,10 +4008,10 @@ namespace BZ10
                     else
                     {
                         statusInfo = "主控串口打开故障";
-                        label18.Text = "主控串口打开故障,请处理！";
+                        lblError.Text = "主控串口打开故障,请处理！";
                         DebOutPut.DebLog("主控串口打开故障");
                         DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "主控串口打开故障");
-                        label18.ForeColor = System.Drawing.Color.Red;
+                        lblError.ForeColor = System.Drawing.Color.Red;
                         return false;
                     }
                     if (Portname.Contains(Param.SerialPortCamera))
@@ -4032,8 +4032,8 @@ namespace BZ10
                         if (int.Parse(Param.YJustRange) != 0 || int.Parse(Param.YNegaRange) != 0 || int.Parse(Param.YCorrecting) != 0 || Param.DripDevice == "1")
                         {
                             statusInfo = "副控串口打开故障";
-                            label18.Text = "副控串口打开故障,请处理！";
-                            label18.ForeColor = System.Drawing.Color.Red;
+                            lblError.Text = "副控串口打开故障,请处理！";
+                            lblError.ForeColor = System.Drawing.Color.Red;
                             return false;
                         }
                     }
@@ -4082,8 +4082,8 @@ namespace BZ10
                     if (serialCount == 4)
                     {
                         statusInfo = "串口初始化失败";
-                        label18.Text = "串口初始化失败,请处理！";
-                        label18.ForeColor = System.Drawing.Color.Red;
+                        lblError.Text = "串口初始化失败,请处理！";
+                        lblError.ForeColor = System.Drawing.Color.Red;
                     }
                     DebOutPut.DebLog("串口初始化失败(第" + serialCount.ToString() + "次)——" + ex.ToString());
                     DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "串口初始化失败(第" + serialCount.ToString() + "次)——" + ex.Message);
@@ -5103,8 +5103,8 @@ namespace BZ10
                     if (serialPort1 == null || !serialPort1.IsOpen)
                     {
                         statusInfo = "主控串口异常";
-                        label18.Text = "主控串口异常，请处理！";
-                        label18.ForeColor = System.Drawing.Color.Red;
+                        lblError.Text = "主控串口异常，请处理！";
+                        lblError.ForeColor = System.Drawing.Color.Red;
                         DebOutPut.DebLog("主控串口异常，设备停止运行！");
                         DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "主控串口异常，设备停止运行！");
                         Timer1Stop();
@@ -7526,8 +7526,8 @@ namespace BZ10
             foreach (var item in diagnosisResults)
                 str += item;
             statusInfo = "故障码:" + str;
-            label18.Text = "故障码:" + str;
-            label18.ForeColor = System.Drawing.Color.Red;
+            lblError.Text = "故障码:" + str;
+            lblError.ForeColor = System.Drawing.Color.Red;
             DebOutPut.DebLog("故障码：" + str);
             DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "故障码：" + str);
             return true;
@@ -7541,8 +7541,8 @@ namespace BZ10
         {
             DebOutPut.DebLog("开始故障诊断");
             statusInfo = "故障码:" + diagnosticModule;
-            label18.Text = "故障码:" + diagnosticModule;
-            label18.ForeColor = System.Drawing.Color.Red;
+            lblError.Text = "故障码:" + diagnosticModule;
+            lblError.ForeColor = System.Drawing.Color.Red;
             DebOutPut.DebLog("故障码：" + diagnosticModule);
             DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "故障码：" + diagnosticModule);
         }
@@ -8135,10 +8135,10 @@ namespace BZ10
                         if (int.Parse(Param.YJustRange) != 0 || int.Parse(Param.YNegaRange) != 0)
                         {
                             statusInfo = "副控串口打开故障";
-                            label18.Text = "副控串口打开故障,请处理！";
+                            lblError.Text = "副控串口打开故障,请处理！";
                             DebOutPut.DebLog("副控串口打开故障");
                             DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "副控串口打开故障");
-                            label18.ForeColor = System.Drawing.Color.Red;
+                            lblError.ForeColor = System.Drawing.Color.Red;
                             return;
                         }
                     }
