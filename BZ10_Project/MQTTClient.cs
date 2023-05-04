@@ -1,4 +1,5 @@
-﻿using BZ10.Common;
+﻿using Aliyun.OSS;
+using BZ10.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -34,17 +35,67 @@ namespace BZ10
         /// 程序锁
         /// </summary>
         private readonly object locker = new object();
+
+        /// <summary>
+        /// 定时发送心跳
+        /// </summary>
+        private System.Timers.Timer myTimer = null;
+        private int inteval = 30000; //心跳间隔
         public MQTTClient(MainForm form1, MQTTModel param)
         {
             form = (MainForm)form1;
             //MQTT对象
             mQTTModel = param;
             //订阅主题
-            strSubscribeTopic = string.Format("downrive/incubator/{0}", Param.DeviceID);
+            strSubscribeTopic = string.Format("downrive/spore/json/{0}", Param.DeviceID);
             //发布主题
-            strPublishTopic = string.Format("upstream/incubator/{0}", Param.DeviceID);
+            strPublishTopic = string.Format("upstream/spore/json/{0}", Param.DeviceID);
         }
 
+        /// <summary>
+        /// 心跳计时器初始化
+        /// </summary>
+        public void InitTimer()
+        {
+            try
+            {
+                if (myTimer == null)
+                {
+                    myTimer = new System.Timers.Timer(inteval);
+                    myTimer.Elapsed += new System.Timers.ElapsedEventHandler(SendKeepLive);
+                    myTimer.Interval = inteval;
+                }
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 定时发送心跳帧
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void SendKeepLive(object source, System.Timers.ElapsedEventArgs e)
+        {
+            try
+            {
+                if (client != null && client.IsConnected)
+                {
+                    KeepLive lc = new KeepLive();
+                    lc.message = "keep-alive";
+                    lc.devId = Param.DeviceID;
+                    lc.func = 100;
+                    lc.err = "";
+                    publishMessage(lc.ObjectToJson());
+                }
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
 
         /// <summary>
         /// 实例化MQTT客户端
@@ -53,12 +104,12 @@ namespace BZ10
         {
             try
             {
-                if (string.IsNullOrEmpty(Param.MQTTAddress) || string.IsNullOrEmpty(Param.MQTTPort))
+                if (string.IsNullOrEmpty(Param.UploadIP) || string.IsNullOrEmpty(Param.UploadPort))
                 {
                     DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "未设置MQTT服务器地址或端口号信息");
                     return;
                 }
-                client = new MqttClient(Param.MQTTAddress, int.Parse(Param.MQTTPort), false, MqttSslProtocols.TLSv1_2, null, null);
+                client = new MqttClient(Param.UploadIP, int.Parse(Param.UploadPort), false, MqttSslProtocols.TLSv1_2, null, null);
                 client.MqttMsgPublishReceived += Client_MqttMsgPublishReceived;//接收消息
                 client.ConnectionClosed += Client_ConnectionClosed;//服务器主动断开重新连接
             }
@@ -198,6 +249,21 @@ namespace BZ10
             {
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "MqttConnect连接异常:" + ex.ToString());
             }
+            finally
+            {
+                //开启定时器，定时发送心跳帧
+                if (myTimer == null)
+                {
+                    InitTimer();
+                    myTimer.Enabled = true;
+                    DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "心跳帧启动！");
+                }
+                else if (myTimer.Enabled == false)
+                {
+                    myTimer.Enabled = true;
+                    DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "心跳帧启动！");
+                }
+            }
 
         }
 
@@ -221,7 +287,7 @@ namespace BZ10
         /// <param name="liftRightClearCount">多点选图</param>
         /// <param name="liftRightMoveInterval">移动间隔</param>
         /// <param name="isBug">调试、正常</param>
-        public void sendDevParam(int hour, int time, int sampleminute, int samplemStrength, int peiyangyeCount, int fanshilinCount, int peiyangTime, int minSteps, int maxSteps, int clearCount, int leftMaxSteps, int rightMaxSteps, int liftRightClearCount, int liftRightMoveInterval, int fanStrengthMax, int fanStrengthMin, int tranStepsMin, int tranStepsMax, int tranClearCount, int xCorrecting, int yCorrecting, int yJustRange, int yNegaRange, int yInterval, int yJustCom, int yNageCom, int yFirst, int yCheck, int isBug)
+        public void sendDevParam(int hour, int time, int sampleminute, int samplemStrength, int peiyangyeCount, int fanshilinCount, int peiyangTime, int minSteps, int maxSteps, int clearCount, int leftMaxSteps, int rightMaxSteps, int liftRightClearCount, int liftRightMoveInterval, int fanStrengthMax, int fanStrengthMin, int tranStepsMin, int tranStepsMax, int tranClearCount, int xCorrecting, int yCorrecting, int yJustRange, int yNegaRange, int yInterval, int yJustCom, int yNageCom, int yFirst, int yCheck,decimal cultureTemperature,int thermostaticCultureTime, int isBug)
         {
             try
             {
@@ -258,6 +324,8 @@ namespace BZ10
                 parm.yNageCom = yNageCom;
                 parm.yFirst = yFirst;
                 parm.yCheck = yCheck;
+                parm.cultureTemperature = cultureTemperature;
+                parm.thermostaticCultureTime = thermostaticCultureTime;
                 parm.isBug = isBug;//1是调试，0是在正常
                 dev.message = parm;
                 publishMessage(dev.ObjectToJson());
@@ -333,7 +401,7 @@ namespace BZ10
         /// <param name="replay"></param>
         /// <param name="err"></param>
         /// <param name="timecontrl"></param>
-        public void sendtimeControl(int replay, String err, String timecontrl)
+        public void sendtimeControl(int replay, String err, List<object> timecontrl)
         {
             try
             {
@@ -433,13 +501,14 @@ namespace BZ10
         /// <param name="func"></param>
         /// <param name="err"></param>
         /// <param name="active"></param>
-        public void SendCurrAction(int func, string err, string active)
+        public void SendCurrAction(int func, string err, string active,string state)
         {
             CurrActive currActive = new CurrActive();
             currActive.func = func;
             currActive.err = err;
             currActive.devId = Param.DeviceID;
             currActive.message = active;
+            currActive.state = state;
             publishMessage(currActive.ObjectToJson());
         }
 
@@ -453,6 +522,11 @@ namespace BZ10
         {
             try
             {
+                string picAliOssUrl = uploadImageAliOSS(path);
+                if (string.IsNullOrEmpty(picAliOssUrl))
+                {
+                    return false;
+                }
                 string strDeviceID = Param.DeviceID;
 
                 InfoPicMsg infopic = new InfoPicMsg();
@@ -462,7 +536,7 @@ namespace BZ10
                 infopic.err = "";
                 picMsg pic = new picMsg();
                 pic.collectTime = time;
-                pic.picStr = Tools.GetBase64FromPic(path);//base64图像
+                pic.picStr = picAliOssUrl;//阿里云Oss图像地址
                 infopic.message = pic;
                 publishMessage(infopic.ObjectToJson());
                 return true;
@@ -475,6 +549,34 @@ namespace BZ10
             }
 
         }
+
+        /// <summary>
+        /// 上传图片至阿里云OSS服务器
+        /// </summary>
+        /// <param name="picPath"></param>
+        /// <returns></returns>
+        private string uploadImageAliOSS(string picPath)
+        {
+            string picAliOssUrl = "";
+            string fileName = System.IO.Path.GetFileName(picPath);
+            //填写Object完整路径，完整路径中不能包含Bucket名称
+            var objectName = string.Format("spore/{0}", fileName);
+            // 创建OssClient实例。
+
+            if (!string.IsNullOrEmpty(Param.OssEndPoint) && !string.IsNullOrEmpty(Param.OssAccessKeyId) && !string.IsNullOrEmpty(Param.OssAccessKeySecret) && !string.IsNullOrEmpty(Param.OssBucketName) && !string.IsNullOrEmpty(Param.OSS_Url))
+            {
+                var client = new OssClient(Param.OssEndPoint, Param.OssAccessKeyId, Param.OssAccessKeySecret);
+                client.PutObject(Param.OssBucketName, objectName, picPath);
+
+                picAliOssUrl = Param.OSS_Url + objectName;
+            }
+            else
+            {
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, "阿里云OSS配置信息不完整");
+            }
+            return picAliOssUrl;
+        }
+
         #endregion
 
         /// <summary>

@@ -2,39 +2,37 @@
 using cn.bmob.api;
 using cn.bmob.io;
 using cn.bmob.tools;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using MvCamCtrl.NET;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Speech.Synthesis;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Media;
-using System.Net.Security;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
 using ToupTek;
-using Emgu.CV;
-using Emgu.CV.Util;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using System.Timers;
-using System.Threading.Tasks;
-using System.Speech.Synthesis;
-using System.Globalization;
 
 namespace BZ10
 {
@@ -56,7 +54,7 @@ namespace BZ10
         //如果模式为定时运行，运行此定时器
         int inTimer5 = 0;
         System.Timers.Timer timer5 = new System.Timers.Timer();
-        //腔体环境、外部环境读取
+        //恒温仓温度读取
         int inTimer6 = 0;
         System.Timers.Timer timer6 = new System.Timers.Timer();
         //镜头点击到PC9限位故障检测
@@ -150,8 +148,6 @@ namespace BZ10
         public static bool isLongRangeDebug = false;
         //设备是否开机   是：true      不是false
         public bool devIsStart = true;
-        //启动timer1的时间
-        public DateTime startTimer1Time = new DateTime();
         string cameraErrStr = "";//相机启动失败原因
         int countdown = 0;
         AutoSizeFormClass asc = new AutoSizeFormClass();
@@ -203,8 +199,8 @@ namespace BZ10
             timer4.Interval = 1000;
             timer5.Elapsed += new ElapsedEventHandler(timer5_Elapsed);//如果模式为定时、时段运行，运行此定时器
             timer5.Interval = 1000;
-            timer6.Elapsed += new ElapsedEventHandler(timer6_Elapsed);//腔体环境、外部环境读取
-            timer6.Interval = 60000;
+            timer6.Elapsed += new ElapsedEventHandler(timer6_Elapsed);//恒温仓温度读取
+            timer6.Interval = 1000;
             timer7.Elapsed += new ElapsedEventHandler(timer7_Elapsed); //镜头电机到PC9限位故障检测
             timer7.Interval = 1000;
             timer8.Elapsed += new ElapsedEventHandler(timer8_Elapsed);//时间刷新、重启
@@ -428,7 +424,7 @@ namespace BZ10
                 this.listView1.View = View.LargeIcon;
                 this.listView1.LargeImageList = this.imageList1;
 
-                ctrls = new PictureBox[13] { pictureBox6, pictureBox7, pictureBox8, pictureBox9, pictureBox10, pictureBox11, pictureBox12, pictureBox13, pictureBox14, pictureBox15, pictureBox16, pictureBox17, pictureBox18 };
+                ctrls = new PictureBox[8] { pictureBox6, pictureBox7, pictureBox8, pictureBox9, pictureBox10, pictureBox11, pictureBox12, pictureBox13 };
                 hideLocations();
                 if (File.Exists(Application.StartupPath + "\\" + configfileName_Old))
                 {
@@ -460,12 +456,6 @@ namespace BZ10
                     label79.Text = "(十)毫秒";
                     buttonX18.Visible = false;
                     buttonX19.Visible = false;
-                }
-
-                if (Param.version == "2")
-                {
-                    cb_Group1.Visible = true;
-                    cb_Group2.Visible = true;
                 }
 
                 RefeshWindowLabel();
@@ -513,7 +503,6 @@ namespace BZ10
                         Thread thread = new Thread(DevRun_T);
                         thread.IsBackground = true;
                         thread.Start();
-                        timer6.Start();
                     }
                 }
                 else
@@ -833,6 +822,8 @@ namespace BZ10
                 if (tcpclient.clientSocket.Connected)
                 {
                     tcpclient.sendLocation(lat, lon);
+                    //发送载玻片数量和当前工作模式
+                    tcpclient.SendSlideGlassCount(134, "", int.Parse(Param.remain), int.Parse(Param.RunFlag), (float)wd);
                 }
                 //传输数据服务器
                 if (Param.IsTransfer == "1")
@@ -844,6 +835,13 @@ namespace BZ10
                     transferParam.port = Convert.ToInt32(Param.TransferUploadPort);
                     transferClient = new TransferClient(this, transferParam);
                     transferClient.connectToSever();//连接服务器
+
+                    if (transferClient.clientSocket.Connected)
+                    {
+                        transferClient.sendLocation(lat, lon);
+                        //发送载玻片数量和当前工作模式
+                        transferClient.SendSlideGlassCount(134, "", int.Parse(Param.remain), int.Parse(Param.RunFlag), (float)wd);
+                    }
                 }
             }
             catch (Exception ex)
@@ -865,8 +863,8 @@ namespace BZ10
 
                 MQTTModel mQTTModel = new MQTTModel()
                 {
-                    Address = Param.MQTTAddress,
-                    Port = Param.MQTTPort,
+                    Address = Param.UploadIP,
+                    Port = Param.UploadPort,
                     ClientID = Param.MQTTClientID,
                     Account = Param.MQTTAccount,
                     Password = Param.MQTTPassword
@@ -878,7 +876,9 @@ namespace BZ10
 
                 if (mqttClient.client.IsConnected)
                 {
-                    mqttClient.sendLocation(lat,lon);
+                    mqttClient.sendLocation(lat, lon);
+                    //发送载玻片数量和当前工作模式
+                    mqttClient.SendSlideGlassCount(134, "", int.Parse(Param.remain), int.Parse(Param.RunFlag), (float)wd);
                 }
 
             }
@@ -913,7 +913,7 @@ namespace BZ10
                     {
                         string collectTime = UploadTable.Rows[i]["CollectTime"].ToString();
                         DateTime dt = Convert.ToDateTime(collectTime);
-                        string imageName = dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
+                        string imageName = dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg";
                         path = Param.BasePath + "\\GrabImg\\" + imageName;
                         if (!File.Exists(path))
                         {
@@ -1115,7 +1115,7 @@ namespace BZ10
                 list.Add(5);
                 list.Add(7);
                 list.Add(9);
-                startTimer1Time = DateTime.Now;
+
                 timer1.Start();
                 /*
                  * 开始计时此初始化时间
@@ -1152,7 +1152,7 @@ namespace BZ10
                 else if (Param.recoveryDevice == "1")
                     list.Add(9);
                 //Timer2Stop();
-                startTimer1Time = DateTime.Now;
+
                 timer1.Start();
 
                 /*
@@ -1183,7 +1183,7 @@ namespace BZ10
                 list.Clear();
                 list.Add(6);
                 list.Add(13);
-                startTimer1Time = DateTime.Now;
+
                 timer1.Start();
                 /*
                  * 开始计时此推片时间
@@ -1213,7 +1213,7 @@ namespace BZ10
                     bStep = 3;
                     list.Clear();
                     list.Add(5);
-                    startTimer1Time = DateTime.Now;
+
                     timer1.Start();
                 }
                 /*
@@ -1241,7 +1241,7 @@ namespace BZ10
                 bStep = 4;
                 list.Clear();
                 list.Add(1);
-                startTimer1Time = DateTime.Now;
+
                 timer1.Start();
 
                 /*
@@ -1297,7 +1297,7 @@ namespace BZ10
                 bStep = 6;
                 list.Clear();
                 list.Add(2);
-                startTimer1Time = DateTime.Now;
+
                 timer1.Start();
 
                 /*
@@ -1362,7 +1362,6 @@ namespace BZ10
                     bStep = 8;
                     list.Clear();
                     list.Add(2);
-                    startTimer1Time = DateTime.Now;
                     timer1.Start();
                 }
             }
@@ -1385,7 +1384,6 @@ namespace BZ10
                 bStep = 9;
                 list.Clear();
                 list.Add(3);
-                startTimer1Time = DateTime.Now;
                 timer1.Start();
                 /*
                  * 开始计时到培养液位置时间
@@ -1405,7 +1403,7 @@ namespace BZ10
         {
             try
             {
-                bStep = 10;
+                bStep = 15;
                 countdown = Convert.ToInt16(Param.peiyangtime) * 60 + 20;
                 //10.滴加培养液
                 Cmd.CommunicateDp(0x61, Convert.ToInt16(Param.peiyangye));
@@ -1413,6 +1411,76 @@ namespace BZ10
                 startTime = DateTime.Now;
                 timer2.Start();
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "Timer2_Start");
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+
+        }
+        /// <summary>
+        /// 推片至恒温培养箱
+        /// </summary>
+        private void pushThermostaticCulture()
+        {
+            try
+            {
+                Cmd.CommunicateDp(0x13, 6);
+                list.Clear();
+                list.Add(17);//X18限位
+                bStep = 16;
+                timer1.Start();
+
+                startTime = DateTime.Now;
+                timer2.Start();
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "推片至恒温培养箱");
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 启动恒温培养
+        /// </summary>
+        private void openThermostaticCulture()
+        {
+            try
+            {
+                bStep = 17;
+                #region
+                int nCultureTemperature = (int)(double.Parse(Param.CultureTemperature) * 10);
+                Cmd.CommunicateDp(0x94, nCultureTemperature);
+                #endregion
+                startTime = DateTime.Now;
+                timer2.Start();
+                timer6.Start();//恒温仓温度
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, string.Format("启动恒温培养,温度{0}", Param.CultureTemperature));
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+
+        }
+        /// <summary>
+        /// 终止恒温培养
+        /// </summary>
+        private void closeThermostaticCulture()
+        {
+            try
+            {
+                bStep = 10;
+                #region
+                Cmd.CommunicateDp(0x95, 0);
+                #endregion
+                startTime = DateTime.Now;
+                timer2.Start();
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "终止恒温培养");
             }
             catch (Exception ex)
             {
@@ -1434,7 +1502,6 @@ namespace BZ10
                 bStep = 11;
                 list.Clear();
                 list.Add(4);
-                startTimer1Time = DateTime.Now;
                 timer1.Start();
                 /*
                  * 开始计时此推片到拍照位置时间
@@ -1482,7 +1549,6 @@ namespace BZ10
                     list.Add(9);
                 else if (Param.recoveryDevice == "1")
                     list.Add(10);
-                startTimer1Time = DateTime.Now;
                 timer1.Start();
                 /*
                 * 开始计时此回收片时间
@@ -1519,7 +1585,6 @@ namespace BZ10
                     list.Add(5);
                     list.Add(7);
                     list.Add(9);
-                    startTimer1Time = DateTime.Now;
                     timer1.Start();
                 }
 
@@ -1754,7 +1819,7 @@ namespace BZ10
                                     isbug = 0;
                                 else if (cb_switch.Checked == true)
                                     isbug = 1;
-                                tcpclient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), isbug);
+                                tcpclient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), decimal.Parse(Param.CultureTemperature), int.Parse(Param.ThermostaticCultureTime), isbug);
                                 break;
                             case 111: //获取设备当前状态和当前动作 服务器→上位机
                                 string position = "";
@@ -1763,25 +1828,28 @@ namespace BZ10
                                     case 1:
                                         position = "原点";
                                         break;
-                                    case 3:
+                                    case 2:
                                         position = "推片";
                                         break;
-                                    case 5:
+                                    case 3:
                                         position = "粘附液";
                                         break;
-                                    case 7:
+                                    case 4:
                                         position = "收集";
                                         break;
-                                    case 9:
+                                    case 5:
                                         position = "培养液";
                                         break;
-                                    case 11:
+                                    case 6:
+                                        position = "恒温培养液";
+                                        break;
+                                    case 7:
                                         position = "拍照";
                                         break;
-                                    case 13:
+                                    case 8:
                                         position = "回收";
                                         break;
-                                    case 14:
+                                    case 9:
                                         position = "复位";
                                         break;
                                     default:
@@ -1798,14 +1866,15 @@ namespace BZ10
                                 tcpclient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
                             case 135: //获取工作时段 服务器→上位机
-                                string temp;
-                                String time1 = "[{ \"time1\":\"" + Param.work1 + "\"},";
-                                String time2 = "{ \"time2\":\"" + Param.work2 + "\"},";
-                                String time3 = "{ \"time3\":\"" + Param.work3 + "\"},";
-                                String time4 = "{ \"time4\":\"" + Param.work4 + "\"},";
-                                String time5 = "{ \"time5\":\"" + Param.work5 + "\"}]";
-                                temp = time1 + time2 + time3 + time4 + time5;
-                                tcpclient.sendtimeControl(135, "", temp);
+                                List<object> listTimes = new List<object>()
+                                {
+                                    new time1Model(){ time1=Param.work1},
+                                    new time2Model(){ time2=Param.work2},
+                                    new time3Model(){ time3=Param.work3},
+                                    new time4Model(){ time4=Param.work4},
+                                    new time5Model(){ time5=Param.work5}
+                                };
+                                tcpclient.sendtimeControl(135, "", listTimes);
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 tcpclient.sendWorkMode(Param.RunFlag);
@@ -1981,6 +2050,22 @@ namespace BZ10
                                     if (yCheck != null && yCheck != "")
                                         Param.Set_ConfigParm(configfileName, "Config", "YCheck", yCheck);
                                 }
+                                if (jo.Property("CultureTemperature") != null && jo.Property("CultureTemperature").ToString() != "")
+                                {
+                                    string cultureTemperature = jo["CultureTemperature"] + "";
+                                    if (!string.IsNullOrEmpty(cultureTemperature))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "CultureTemperature", cultureTemperature);
+                                    }
+                                }
+                                if (jo.Property("ThermostaticCultureTime") != null && jo.Property("ThermostaticCultureTime").ToString() != "")
+                                {
+                                    string thermostaticCultureTime = jo["ThermostaticCultureTime"] + "";
+                                    if (!string.IsNullOrEmpty(thermostaticCultureTime))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "ThermostaticCultureTime", thermostaticCultureTime);
+                                    }
+                                }
                                 Param.Init_Param(configfileName);
                                 RefeshWindowLabel();
                                 tcpclient.Replay(123, "success", "");
@@ -1992,14 +2077,14 @@ namespace BZ10
                                 tcpclient.Replay(124, "success", "");
                                 Param.Set_ConfigParm(configfileName, "Config", "RunFlag", mode);
                                 DevStopWork();
-                                DevStartWork();
-
-                                DebOutPut.DebLog("同步载破片数量和工作模式");
+                                //DevStartWork();
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "同步载破片数量和工作模式");
                                 int remain = int.Parse(this.TxtRemain.Text.Trim());//载玻片数量
                                 if (remain < 0)
                                     remain = 0;
                                 int currRunMode = this.TxtRunMode.SelectedIndex;//当前工作模式
                                 tcpclient.SendSlideGlassCount(134, "", remain, currRunMode, (float)wd);
+                                Tools.RestStart();
                                 break;
                             case 129: //远程重启设备  服务器→上位机
                                 tcpclient.Replay(129, "success", "");
@@ -2013,8 +2098,8 @@ namespace BZ10
                                     if (!devIsStart)
                                     {
                                         statusInfo = "正常";
-                                        locaiton = 13;
-                                        tcpclient.SendCurrAction(142, "", "回收");
+                                        locaiton = 8;
+                                        tcpclient.SendCurrAction(142, "", "回收", statusInfo);
                                         hideLocations();
                                         DevStartWork();
                                     }
@@ -2088,7 +2173,7 @@ namespace BZ10
                                     {
                                         tcpclient.Replay(137, "success", "");
                                         bstop = false;
-                                        setLocation(2);
+                                        setLocation(1);
                                         inituipian();
                                     }
                                 }
@@ -2099,7 +2184,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     tcpclient.Replay(138, "success", "");
-                                    setLocation(4);
+                                    setLocation(2);
                                     tuifanshilin();
                                 }
                                 else
@@ -2109,7 +2194,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     tcpclient.Replay(139, "success", "");
-                                    setLocation(6);
+                                    setLocation(3);
                                     tuipianFengshan();
                                 }
                                 else
@@ -2119,7 +2204,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     tcpclient.Replay(140, "success", "");
-                                    setLocation(8);
+                                    setLocation(4);
                                     tuiPeiyangye();
                                 }
                                 else
@@ -2129,7 +2214,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     tcpclient.Replay(126, "success", "开始拍照");
-                                    setLocation(10);
+                                    setLocation(6);
                                     tuipaizhao();
                                 }
                                 else
@@ -2148,6 +2233,9 @@ namespace BZ10
                                 break;
                             case 142://当前动作 服务器→上位机
                                 break;
+
+
+
                         }
                     }
                 }
@@ -2218,7 +2306,8 @@ namespace BZ10
                                     isbug = 0;
                                 else if (cb_switch.Checked == true)
                                     isbug = 1;
-                                transferClient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), isbug);
+                                transferClient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), decimal.Parse(Param.CultureTemperature), int.Parse(Param.ThermostaticCultureTime)
+, isbug);
                                 break;
                             case 111: //获取设备当前状态和当前动作 服务器→上位机
                                 string position = "";
@@ -2227,25 +2316,28 @@ namespace BZ10
                                     case 1:
                                         position = "原点";
                                         break;
-                                    case 3:
+                                    case 2:
                                         position = "推片";
                                         break;
-                                    case 5:
+                                    case 3:
                                         position = "粘附液";
                                         break;
-                                    case 7:
+                                    case 4:
                                         position = "收集";
                                         break;
-                                    case 9:
+                                    case 5:
                                         position = "培养液";
                                         break;
-                                    case 11:
+                                    case 6:
+                                        position = "恒温培养液";
+                                        break;
+                                    case 7:
                                         position = "拍照";
                                         break;
-                                    case 13:
+                                    case 8:
                                         position = "回收";
                                         break;
-                                    case 14:
+                                    case 9:
                                         position = "复位";
                                         break;
                                     default:
@@ -2262,14 +2354,16 @@ namespace BZ10
                                 transferClient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
                             case 135: //获取工作时段 服务器→上位机
-                                string temp;
-                                String time1 = "[{ \"time1\":\"" + Param.work1 + "\"},";
-                                String time2 = "{ \"time2\":\"" + Param.work2 + "\"},";
-                                String time3 = "{ \"time3\":\"" + Param.work3 + "\"},";
-                                String time4 = "{ \"time4\":\"" + Param.work4 + "\"},";
-                                String time5 = "{ \"time5\":\"" + Param.work5 + "\"}]";
-                                temp = time1 + time2 + time3 + time4 + time5;
-                                transferClient.sendtimeControl(135, "", temp);
+                                //发送时间段
+                                List<object> listTimes = new List<object>()
+                                {
+                                    new time1Model(){ time1=Param.work1},
+                                    new time2Model(){ time2=Param.work2},
+                                    new time3Model(){ time3=Param.work3},
+                                    new time4Model(){ time4=Param.work4},
+                                    new time5Model(){ time5=Param.work5}
+                                };
+                                transferClient.sendtimeControl(135, "", listTimes);
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 transferClient.sendWorkMode(Param.RunFlag);
@@ -2445,6 +2539,22 @@ namespace BZ10
                                     if (yCheck != null && yCheck != "")
                                         Param.Set_ConfigParm(configfileName, "Config", "YCheck", yCheck);
                                 }
+                                if (jo.Property("CultureTemperature") != null && jo.Property("CultureTemperature").ToString() != "")
+                                {
+                                    string cultureTemperature = jo["CultureTemperature"] + "";
+                                    if (!string.IsNullOrEmpty(cultureTemperature))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "CultureTemperature", cultureTemperature);
+                                    }
+                                }
+                                if (jo.Property("ThermostaticCultureTime") != null && jo.Property("ThermostaticCultureTime").ToString() != "")
+                                {
+                                    string thermostaticCultureTime = jo["ThermostaticCultureTime"] + "";
+                                    if (!string.IsNullOrEmpty(thermostaticCultureTime))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "ThermostaticCultureTime", thermostaticCultureTime);
+                                    }
+                                }
                                 Param.Init_Param(configfileName);
                                 RefeshWindowLabel();
                                 transferClient.Replay(123, "success", "");
@@ -2456,14 +2566,14 @@ namespace BZ10
                                 transferClient.Replay(124, "success", "");
                                 Param.Set_ConfigParm(configfileName, "Config", "RunFlag", mode);
                                 DevStopWork();
-                                DevStartWork();
-
-                                DebOutPut.DebLog("同步载破片数量和工作模式");
+                                //DevStartWork();
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "同步载破片数量和工作模式");
                                 int remain = int.Parse(this.TxtRemain.Text.Trim());//载玻片数量
                                 if (remain < 0)
                                     remain = 0;
                                 int currRunMode = this.TxtRunMode.SelectedIndex;//当前工作模式
                                 transferClient.SendSlideGlassCount(134, "", remain, currRunMode, (float)wd);
+                                Tools.RestStart();
                                 break;
                             case 129: //远程重启设备  服务器→上位机
                                 transferClient.Replay(129, "success", "");
@@ -2477,8 +2587,8 @@ namespace BZ10
                                     if (!devIsStart)
                                     {
                                         statusInfo = "正常";
-                                        locaiton = 13;
-                                        transferClient.SendCurrAction(142, "", "回收");
+                                        locaiton = 8;
+                                        transferClient.SendCurrAction(142, "", "回收", statusInfo);
                                         hideLocations();
                                         DevStartWork();
                                     }
@@ -2552,7 +2662,7 @@ namespace BZ10
                                     {
                                         transferClient.Replay(137, "success", "");
                                         bstop = false;
-                                        setLocation(2);
+                                        setLocation(1);
                                         inituipian();
                                     }
                                 }
@@ -2563,7 +2673,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     transferClient.Replay(138, "success", "");
-                                    setLocation(4);
+                                    setLocation(2);
                                     tuifanshilin();
                                 }
                                 else
@@ -2573,7 +2683,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     transferClient.Replay(139, "success", "");
-                                    setLocation(6);
+                                    setLocation(3);
                                     tuipianFengshan();
                                 }
                                 else
@@ -2583,7 +2693,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     transferClient.Replay(140, "success", "");
-                                    setLocation(8);
+                                    setLocation(4);
                                     tuiPeiyangye();
                                 }
                                 else
@@ -2593,7 +2703,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     transferClient.Replay(126, "success", "开始拍照");
-                                    setLocation(10);
+                                    setLocation(6);
                                     tuipaizhao();
                                 }
                                 else
@@ -2694,7 +2804,8 @@ namespace BZ10
                                     isbug = 0;
                                 else if (cb_switch.Checked == true)
                                     isbug = 1;
-                                mqttClient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), isbug);
+                                mqttClient.sendDevParam(Convert.ToInt32(Param.CollectHour), Convert.ToInt32(Param.CollectMinute), Convert.ToInt32(Param.FanMinutes), Convert.ToInt32(Param.FanStrength), Convert.ToInt32(Param.peiyangye), Convert.ToInt32(Param.fanshilin), Convert.ToInt32(Param.peiyangtime), Convert.ToInt32(Param.MinSteps), Convert.ToInt32(Param.MaxSteps), Convert.ToInt32(Param.clearCount), Convert.ToInt32(Param.leftMaxSteps), Convert.ToInt32(Param.rightMaxSteps), Convert.ToInt32(Param.liftRightClearCount), Convert.ToInt32(Param.moveInterval), Convert.ToInt32(Param.FanStrengthMax), Convert.ToInt32(Param.FanStrengthMin), Convert.ToInt32(Param.tranStepsMin), Convert.ToInt32(Param.tranStepsMax), Convert.ToInt32(Param.tranClearCount), Convert.ToInt32(Param.XCorrecting), Convert.ToInt32(Param.YCorrecting), Convert.ToInt32(Param.YJustRange), Convert.ToInt32(Param.YNegaRange), Convert.ToInt32(Param.YInterval), Convert.ToInt32(Param.YJustCom), Convert.ToInt32(Param.YNageCom), Convert.ToInt32(Param.YFirst), Convert.ToInt32(Param.YCheck), decimal.Parse(Param.CultureTemperature), int.Parse(Param.ThermostaticCultureTime)
+, isbug);
                                 break;
                             case 111: //获取设备当前状态和当前动作 服务器→上位机
                                 string position = "";
@@ -2703,25 +2814,28 @@ namespace BZ10
                                     case 1:
                                         position = "原点";
                                         break;
-                                    case 3:
+                                    case 2:
                                         position = "推片";
                                         break;
-                                    case 5:
+                                    case 3:
                                         position = "粘附液";
                                         break;
-                                    case 7:
+                                    case 4:
                                         position = "收集";
                                         break;
-                                    case 9:
+                                    case 5:
                                         position = "培养液";
                                         break;
-                                    case 11:
+                                    case 6:
+                                        position = "恒温培养液";
+                                        break;
+                                    case 7:
                                         position = "拍照";
                                         break;
-                                    case 13:
+                                    case 8:
                                         position = "回收";
                                         break;
-                                    case 14:
+                                    case 9:
                                         position = "复位";
                                         break;
                                     default:
@@ -2738,14 +2852,15 @@ namespace BZ10
                                 mqttClient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
                             case 135: //获取工作时段 服务器→上位机
-                                string temp;
-                                String time1 = "[{ \"time1\":\"" + Param.work1 + "\"},";
-                                String time2 = "{ \"time2\":\"" + Param.work2 + "\"},";
-                                String time3 = "{ \"time3\":\"" + Param.work3 + "\"},";
-                                String time4 = "{ \"time4\":\"" + Param.work4 + "\"},";
-                                String time5 = "{ \"time5\":\"" + Param.work5 + "\"}]";
-                                temp = time1 + time2 + time3 + time4 + time5;
-                                mqttClient.sendtimeControl(135, "", temp);
+                                List<object> listTimes = new List<object>()
+                                {
+                                    new time1Model(){ time1=Param.work1},
+                                    new time2Model(){ time2=Param.work2},
+                                    new time3Model(){ time3=Param.work3},
+                                    new time4Model(){ time4=Param.work4},
+                                    new time5Model(){ time5=Param.work5}
+                                };
+                                mqttClient.sendtimeControl(135, "", listTimes);
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 mqttClient.sendWorkMode(Param.RunFlag);
@@ -2921,6 +3036,22 @@ namespace BZ10
                                     if (yCheck != null && yCheck != "")
                                         Param.Set_ConfigParm(configfileName, "Config", "YCheck", yCheck);
                                 }
+                                if (jo.Property("CultureTemperature") != null && jo.Property("CultureTemperature").ToString() != "")
+                                {
+                                    string cultureTemperature = jo["CultureTemperature"] + "";
+                                    if (!string.IsNullOrEmpty(cultureTemperature))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "CultureTemperature", cultureTemperature);
+                                    }
+                                }
+                                if (jo.Property("ThermostaticCultureTime") != null && jo.Property("ThermostaticCultureTime").ToString() != "")
+                                {
+                                    string thermostaticCultureTime = jo["ThermostaticCultureTime"] + "";
+                                    if (!string.IsNullOrEmpty(thermostaticCultureTime))
+                                    {
+                                        Param.Set_ConfigParm(configfileName, "Config", "ThermostaticCultureTime", thermostaticCultureTime);
+                                    }
+                                }
                                 Param.Init_Param(configfileName);
                                 RefeshWindowLabel();
                                 mqttClient.Replay(123, "success", "");
@@ -2932,14 +3063,14 @@ namespace BZ10
                                 mqttClient.Replay(124, "success", "");
                                 Param.Set_ConfigParm(configfileName, "Config", "RunFlag", mode);
                                 DevStopWork();
-                                DevStartWork();
-
-                                DebOutPut.DebLog("同步载破片数量和工作模式");
+                                //DevStartWork();
+                                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "同步载破片数量和工作模式");
                                 int remain = int.Parse(this.TxtRemain.Text.Trim());//载玻片数量
                                 if (remain < 0)
                                     remain = 0;
                                 int currRunMode = this.TxtRunMode.SelectedIndex;//当前工作模式
                                 mqttClient.SendSlideGlassCount(134, "", remain, currRunMode, (float)wd);
+                                Tools.RestStart();
                                 break;
                             case 129: //远程重启设备  服务器→上位机
                                 mqttClient.Replay(129, "success", "");
@@ -2953,8 +3084,8 @@ namespace BZ10
                                     if (!devIsStart)
                                     {
                                         statusInfo = "正常";
-                                        locaiton = 13;
-                                        mqttClient.SendCurrAction(142, "", "回收");
+                                        locaiton = 8;
+                                        mqttClient.SendCurrAction(142, "", "回收", statusInfo);
                                         hideLocations();
                                         DevStartWork();
                                     }
@@ -3030,7 +3161,7 @@ namespace BZ10
                                     {
                                         mqttClient.Replay(137, "success", "");
                                         bstop = false;
-                                        setLocation(2);
+                                        setLocation(1);
                                         inituipian();
                                     }
                                 }
@@ -3043,7 +3174,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     mqttClient.Replay(138, "success", "");
-                                    setLocation(4);
+                                    setLocation(2);
                                     tuifanshilin();
                                 }
                                 else
@@ -3055,7 +3186,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     mqttClient.Replay(139, "success", "");
-                                    setLocation(6);
+                                    setLocation(3);
                                     tuipianFengshan();
                                 }
                                 else
@@ -3067,7 +3198,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     mqttClient.Replay(140, "success", "");
-                                    setLocation(8);
+                                    setLocation(4);
                                     tuiPeiyangye();
                                 }
                                 else
@@ -3079,7 +3210,7 @@ namespace BZ10
                                 if (cb_switch.Checked)
                                 {
                                     mqttClient.Replay(126, "success", "开始拍照");
-                                    setLocation(10);
+                                    setLocation(6);
                                     tuipaizhao();
                                 }
                                 else
@@ -3127,7 +3258,7 @@ namespace BZ10
         /// </summary>
         private void ResCard(object tcpType)
         {
-            setLocation(12);
+            setLocation(7);
             while (!isReady() && !bstop)
             {
                 DebOutPut.DebLog("检测状态不到位");
@@ -3135,16 +3266,16 @@ namespace BZ10
             }
             if (bstop)
                 return;
-            locaiton = 13;
+            locaiton = 8;
             ResetStatu();
             Thread.Sleep(110 * 1000);
             setLocation(0);
 
             switch (tcpType + "")
             {
-                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
-                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
-                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
+                case "0": tcpclient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点", statusInfo); break;
             }
 
             locaiton = 1;
@@ -3157,7 +3288,7 @@ namespace BZ10
         /// </summary>
         private void DevState(object tcpType)
         {
-            locaiton = 14;
+            locaiton = 9;
             while (!isReady() && !bstop)
             {
                 DebOutPut.DebLog("检测状态不到位");
@@ -3175,9 +3306,9 @@ namespace BZ10
 
             switch (tcpType + "")
             {
-                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
-                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
-                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
+                case "0": tcpclient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点", statusInfo); break;
             }
             locaiton = 1;
         }
@@ -3282,7 +3413,7 @@ namespace BZ10
             }
             if (bstop)
                 return;
-            locaiton = 14;//表示复位位置
+            locaiton = 9;//表示复位位置
             //进入调试模式
             DebugMode();
             this.cb_switch.Checked = true;
@@ -3306,9 +3437,9 @@ namespace BZ10
             Thread.Sleep(100 * 1000);
             switch (tcpType + "")
             {
-                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
-                case "1": transferClient.SendCurrAction(142, "", "原点"); break;
-                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
+                case "0": tcpclient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "1": transferClient.SendCurrAction(142, "", "原点", statusInfo); break;
+                case "2": mqttClient.SendCurrAction(142, "", "原点", statusInfo); break;
             }
             locaiton = 1;
             isDevRes = false;
@@ -3522,12 +3653,13 @@ namespace BZ10
                 switch (index)
                 {
                     case 0: message = "到达原点位置"; break;
-                    case 2: message = "到达推片位置，推片就绪"; break;
-                    case 4: message = "滴加粘附液"; break;
-                    case 6: message = "收集孢子"; break;
-                    case 8: message = "滴加培养液"; break;
-                    case 10: message = "推片到拍照位置"; break;
-                    case 12: message = "回收玻片"; break;
+                    case 1: message = "到达推片位置，推片就绪"; break;
+                    case 2: message = "滴加粘附液"; break;
+                    case 3: message = "收集孢子"; break;
+                    case 4: message = "滴加培养液"; break;
+                    case 5: message = "恒温培养"; break;
+                    case 6: message = "推片到拍照位置"; break;
+                    case 7: message = "回收玻片"; break;
                     default: break;
                 }
                 if (!string.IsNullOrEmpty(message))
@@ -3704,10 +3836,10 @@ namespace BZ10
                     }
                 }
                 //雨
-                if (((dirs >> 14) & 0x01) == 0)
-                    lb_yk.Text = "无雨";
-                else
-                    lb_yk.Text = "有雨";
+                //if (((dirs >> 14) & 0x01) == 0)
+                //    lb_yk.Text = "无雨";
+                //else
+                //    lb_yk.Text = "有雨";
                 if (count != 3)
                 {
                     string str = "";
@@ -4467,7 +4599,7 @@ namespace BZ10
                     string time = dt.Rows[i]["CollectTime"].ToString();
                     row["CollectTime"] = time;
                     string picPath = Path.Combine(Param.BasePath, "GrabImg");
-                    picPath = Path.Combine(picPath, Convert.ToDateTime(time).ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp");
+                    picPath = Path.Combine(picPath, Convert.ToDateTime(time).ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg");
                     row["path"] = picPath;
                     TableTemp.Rows.Add(row);
 
@@ -4716,22 +4848,7 @@ namespace BZ10
                         //图片添加水印
                         if (img != null)
                         {
-                            if (Param.version == "2")//带光控雨控
-                            {
-                                using (Graphics g = Graphics.FromImage(img))
-                                {
-                                    string devNum = "ID:" + Param.DeviceID;
-                                    string time = "时间:" + collectTime;
-                                    string wendu = (this.lb_wd.Text.Trim() == "温度" || this.lb_wd.Text.Trim() == "无数据") ? "温度:---" : this.lb_wd.Text.Trim();
-                                    string shidu = (this.lb_sd.Text.Trim() == "湿度" || this.lb_sd.Text.Trim() == "无数据") ? "湿度:---" : this.lb_sd.Text.Trim();
-                                    string guangzhao = (this.lb_gz.Text.Trim() == "光照" || this.lb_gz.Text.Trim() == "无数据") ? "光照:---" : this.lb_gz.Text.Trim();
-                                    string yukong = (this.lb_yk.Text.Trim() == "雨控" || this.lb_yk.Text.Trim() == "无数据") ? "雨控:---" : this.lb_yk.Text.Trim();
-                                    string hj = wendu + "   " + shidu + "   " + guangzhao + "   " + yukong;
-                                    string context = devNum + "   " + time + "   " + hj;
-                                    g.DrawString(context, new Font("仿宋_GB2312", 40, FontStyle.Bold), System.Drawing.Brushes.Yellow, new PointF(50, 10));
-                                }
-                            }
-                            else if (Param.version == "1")//不带光控雨控
+                            if (Param.version == "1")//不带光控雨控
                             {
                                 using (Graphics g = Graphics.FromImage(img))
                                 {
@@ -4744,7 +4861,7 @@ namespace BZ10
                                 }
                             }
                             //保存图片
-                            if (Param.SaveImage(img, dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp"))
+                            if (Param.SaveImage(img, dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg"))
                             {
                                 img.Dispose();
                                 sql = "insert into Record (Flag,CollectTime) values ('0','" + collectTime + "')";
@@ -4884,10 +5001,6 @@ namespace BZ10
             try
             {
                 devstatus.clear();
-                StringBuilder sb = new StringBuilder();
-                string[] yes = new string[] { "轴1 原点位置", "轴1 粘附液位置", "轴1 吸孢子位置", "轴1： 培养液位置", "轴1：拍照位置", "轴2:原点位置", "轴2:已推片位置", "轴3：接片位置", "轴3：原点位置", "轴4：原点位置", "轴4：推完片位置" };
-                string[] no = new string[] { "轴1 未到原点位置", "轴1 未到粘附液位置", "轴1 未到吸孢子位置", "轴1： 未到培养液位置", "轴1：未到拍照位置", "轴2:未到原点位置", "轴2:未到已推片位置", "轴3：未到接片位置", "轴3：未到原点位置", "轴4：未到原点位置", "轴4：未到推完片位置" };
-
                 byte[] ret = Cmd.CommunicateDp(0xA0, 0);
                 if (ret == null || ret[0] != 0xFF)
                 {
@@ -4895,29 +5008,22 @@ namespace BZ10
                 }
                 // ret[7]=0x1A;
                 //ret[6]=0xA1;
-                int dirs = (ret[7] << 8) | ret[6];//可用于指示15个位当前状态
+                int dirs = (ret[8] << 16) | (ret[7] << 8) | ret[6];//可用于指示23个位当前状态
 
                 foreach (byte i in bits)
                 {
 
                     if (((dirs >> i) & 0x01) == 1)
                     {
-                        //  sb.Append(yes[i]);
                         //i值介绍：
                         //0：x1   1：x2   2：x3    3：x4，依次类推
                         devstatus.bits[i] = 1;
-                        //   ct[i].BackColor = Color.Green;
                     }
                     else
                     {
-                        // sb.Append(no[i]);
-
                         devstatus.bits[i] = 0;
-                        // ct[i].BackColor = Color.Yellow;
                     }
                 }
-
-                devstatus.status = sb.ToString();
                 devstatus.isReady(bits);
 
                 int count = 0;
@@ -4979,14 +5085,7 @@ namespace BZ10
                     }
                 }
                 //雨
-                if (((dirs >> 14) & 0x01) == 0)
-                {
-                    lb_yk.Text = "无雨";
-                }
-                else
-                {
-                    lb_yk.Text = "有雨";
-                }
+
                 if (count != 3)
                 {
                     string str = "";
@@ -5149,19 +5248,19 @@ namespace BZ10
                             setLocation(0);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "原点"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "原点", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "原点"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "原点"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "原点", statusInfo); break;
                             }
                             inituipian();
                             break;
                         case 1://已经到达推片位置，推片就绪
-                            setLocation(2);
+                            setLocation(1);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "推片"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "推片", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "推片"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "推片"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "推片", statusInfo); break;
                             }
                             tuipian();
                             break;
@@ -5173,12 +5272,12 @@ namespace BZ10
                             tuifanshilin();
                             break;
                         case 4://滴加粘附液
-                            setLocation(4);
+                            setLocation(2);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "粘附液"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "粘附液", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "粘附液"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "粘附液"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "粘附液", statusInfo); break;
                             }
                             jiafanshilin();
                             break;
@@ -5186,12 +5285,12 @@ namespace BZ10
                             tuipianFengshan();
                             break;
                         case 6:  //打开风机
-                            setLocation(6);
+                            setLocation(3);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "收集"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "收集", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "收集"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "收集"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "收集", statusInfo); break;
                             }
                             openFengji();
                             break;
@@ -5202,22 +5301,38 @@ namespace BZ10
                             tuiPeiyangye();
                             break;
                         case 9://滴加培养液
-                            setLocation(8);
+                            setLocation(4);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "培养液"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "培养液", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "培养液"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "培养液"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "培养液", statusInfo); break;
                             }
                             peiyang();
                             break;
-                        case 10://推片到拍照位置
-                            setLocation(10);
+                        case 15://推片到恒温培养箱
+                            pushThermostaticCulture();
+                            break;
+                        case 16://启动恒温培养
+                            setLocation(5);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "拍照"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "恒温培养", statusInfo); break;
+                                case "1": httpRequest.sendDeviceStatus(142, "", "恒温培养"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "恒温培养", statusInfo); break;
+                            }
+                            openThermostaticCulture();
+                            break;
+                        case 17://终止恒温培养
+                            closeThermostaticCulture();
+                            break;
+                        case 10://推片到拍照位置
+                            setLocation(6);
+                            switch (Param.NetworkCommunication)
+                            {
+                                case "0": tcpclient.SendCurrAction(142, "", "拍照", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "拍照"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "拍照"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "拍照", statusInfo); break;
                             }
                             tuipaizhao();
                             break;
@@ -5228,12 +5343,12 @@ namespace BZ10
                             myThread.Start();
                             break;
                         case 12://回归原点
-                            setLocation(12);
+                            setLocation(7);
                             switch (Param.NetworkCommunication)
                             {
-                                case "0": tcpclient.SendCurrAction(142, "", "回收"); break;
+                                case "0": tcpclient.SendCurrAction(142, "", "回收", statusInfo); break;
                                 case "1": httpRequest.sendDeviceStatus(142, "", "回收"); break;
-                                case "2": mqttClient.SendCurrAction(142, "", "回收"); break;
+                                case "2": mqttClient.SendCurrAction(142, "", "回收", statusInfo); break;
                             }
                             finish();
                             break;
@@ -5385,7 +5500,6 @@ namespace BZ10
                 if (!StartOldNewCamera())
                 {
                     button12.Text = "自动对焦";
-                    startTimer1Time = DateTime.Now;
                     timer1.Start();
                     return;
                 }
@@ -5671,14 +5785,13 @@ namespace BZ10
                 if (!isLongRangeDebug)
                 {
                     bStep = 14;
-                    startTimer1Time = DateTime.Now;
                     timer1.Start();
                 }
                 switch (Param.NetworkCommunication)
                 {
-                    case "0": tcpclient.SendCurrAction(142, "", "拍照"); break;
+                    case "0": tcpclient.SendCurrAction(142, "", "拍照", statusInfo); break;
                     case "1": httpRequest.sendDeviceStatus(142, "", "拍照"); break;
-                    case "2": mqttClient.SendCurrAction(142, "", "拍照"); break;
+                    case "2": mqttClient.SendCurrAction(142, "", "拍照", statusInfo); break;
                 }
             }
             catch (Exception ex)
@@ -5785,7 +5898,7 @@ namespace BZ10
             Timer2Stop();
             Thread.Sleep(15000);
             DebOutPut.DebLog("轴三移动到X9位置");
-            bStep = 15;
+            bStep = 18;
             Cmd.CommunicateDp(0x33, 2);
             list.Clear();
             list.Add(8);
@@ -6040,22 +6153,7 @@ namespace BZ10
 
                     //TODO：打水印
                     #region 打水印
-                    if (Param.version == "2")//带光控雨控
-                    {
-                        using (Graphics g = Graphics.FromImage(bitmap))
-                        {
-                            string devNum = "ID:" + Param.DeviceID;
-                            string time = "时间:" + collectTime;
-                            string wendu = (this.lb_wd.Text.Trim() == "温度" || this.lb_wd.Text.Trim() == "无数据") ? "温度:---" : this.lb_wd.Text.Trim();
-                            string shidu = (this.lb_sd.Text.Trim() == "湿度" || this.lb_sd.Text.Trim() == "无数据") ? "湿度:---" : this.lb_sd.Text.Trim();
-                            string guangzhao = (this.lb_gz.Text.Trim() == "光照" || this.lb_gz.Text.Trim() == "无数据") ? "光照:---" : this.lb_gz.Text.Trim();
-                            string yukong = (this.lb_yk.Text.Trim() == "雨控" || this.lb_yk.Text.Trim() == "无数据") ? "雨控:---" : this.lb_yk.Text.Trim();
-                            string hj = wendu + "   " + shidu + "   " + guangzhao + "   " + yukong;
-                            string context = devNum + "   " + time + "   " + hj;
-                            g.DrawString(context, new Font("仿宋_GB2312", 40, FontStyle.Bold), System.Drawing.Brushes.Yellow, new PointF(50, 10));
-                        }
-                    }
-                    else if (Param.version == "1")//不带光控雨控
+                    if (Param.version == "1")//不带光控雨控
                     {
                         using (Graphics g = Graphics.FromImage(bitmap))
                         {
@@ -6256,7 +6354,7 @@ namespace BZ10
             //3、膨胀减去腐蚀
             Mat xtimg = new Mat();
             CvInvoke.Subtract(dilateImg, erodeImg, xtimg);
-            pictureBox1.BackgroundImage = xtimg.Bitmap;
+            pbLogo.BackgroundImage = xtimg.Bitmap;
             #endregion
 
             #region 2、轮廓绘制前处理
@@ -6314,7 +6412,7 @@ namespace BZ10
                 Image<Bgr, Byte> clone = src.Clone();
                 if (!Directory.Exists(Param.MattingPath))
                     Directory.CreateDirectory(Param.MattingPath);
-                CvInvoke.Imwrite(Param.MattingPath + "\\抠图" + countA + ".bmp", clone); //保存结果图 
+                CvInvoke.Imwrite(Param.MattingPath + "\\抠图" + countA + ".jpg", clone); //保存结果图 
                 clone.Dispose();
             }
             src.Dispose();
@@ -6348,7 +6446,7 @@ namespace BZ10
         {
             if (!Directory.Exists(Param.MattingPath))
                 Directory.CreateDirectory(Param.MattingPath);
-            string[] files = Directory.GetFiles(Param.MattingPath, "*.bmp");
+            string[] files = Directory.GetFiles(Param.MattingPath, "*.jpg");
             DebOutPut.DebLog("抠图数量为：" + files.Length + " 张");
             if (files.Length == 0)
                 return false;
@@ -6371,7 +6469,7 @@ namespace BZ10
                 //3、膨胀减去腐蚀
                 Mat xtimg = new Mat();
                 CvInvoke.Subtract(dilateImg, erodeImg, xtimg);
-                pictureBox1.BackgroundImage = xtimg.Bitmap;
+                pbLogo.BackgroundImage = xtimg.Bitmap;
                 #endregion
 
                 #region 2、轮廓绘制前处理
@@ -6825,7 +6923,7 @@ namespace BZ10
             MoveUporMove(true, Convert.ToString(nstep));
             Thread.Sleep(2000);
             DateTime dt = DateTime.Now;//采集时间
-            string path = Param.BasePath + "\\GrabImg\\" + dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
+            string path = Param.BasePath + "\\GrabImg\\" + dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg";
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -6852,7 +6950,7 @@ namespace BZ10
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "拍照失败！");
                 return "";
             }
-            Param.SaveImage(realTimeImage, dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp");
+            Param.SaveImage(realTimeImage, dt.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg");
             Thread.Sleep(2000);
             realTimeImage.Dispose();
             DebOutPut.DebLog("图像释放");
@@ -7218,13 +7316,13 @@ namespace BZ10
             for (int i = 0; i < CropDataTable.Rows.Count; i++)
             {
                 DateTime dateTime = DateTime.Parse(CropDataTable.Rows[i].ItemArray[2].ToString());
-                string name = dateTime.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".bmp";
+                string name = dateTime.ToString("yyyyMMddHHmmss", System.Globalization.DateTimeFormatInfo.InvariantInfo) + ".jpg";
                 imageNames.Add(name);
             }
             DebOutPut.DebLog("数据库中图像总量:" + imageNames.Count);
             string imagePath = Param.BasePath + "\\GrabImg\\";
             DirectoryInfo file = new DirectoryInfo(imagePath);
-            FileInfo[] fileInfos = file.GetFiles("*.bmp");
+            FileInfo[] fileInfos = file.GetFiles("*.jpg");
             DebOutPut.DebLog("图库中图像总数:" + fileInfos.Length);
             int count = 0;
             for (int i = 0; i < fileInfos.Length; i++)
@@ -7328,7 +7426,6 @@ namespace BZ10
                             if (!isLongRangeDebug)
                             {
                                 Timer2Stop();
-                                startTimer1Time = DateTime.Now;
                                 timer1.Start();
                             }
                         }
@@ -7357,7 +7454,6 @@ namespace BZ10
                             {
                                 label30.Text = "无数据";
                                 DebOutPut.DebLog("采集时间已达标");
-                                startTimer1Time = DateTime.Now;
                                 timer1.Start();
                                 Timer2Stop();
                             }
@@ -7373,7 +7469,6 @@ namespace BZ10
                                 {
                                     label30.Text = "无数据";
                                     DebOutPut.DebLog("采集时间已达标");
-                                    startTimer1Time = DateTime.Now;
                                     timer1.Start();
                                     Timer2Stop();
                                 }
@@ -7392,8 +7487,7 @@ namespace BZ10
                             }
                         }
                     }
-                    //计算滴加培养液时间是否达到
-                    else if (bStep == 10)
+                    else if (bStep == 15)
                     {
                         label30.Text = "培养时间倒计时:\r\n" + Tools.GetNowTimeSpanSec((startTime.AddSeconds(int.Parse(Param.dropTime))).AddMinutes(Convert.ToInt16(Param.peiyangtime)), dt) + " 秒\r\n(含" + Param.dropTime + "秒滴液时间)";
                         //滴加培养液时间是否达标
@@ -7407,11 +7501,49 @@ namespace BZ10
                                 if (!isLongRangeDebug)
                                 {
                                     Timer2Stop();
-                                    startTimer1Time = DateTime.Now;
                                     timer1.Start();
                                 }
                             }
-
+                        }
+                    }
+                    else if (bStep == 16)
+                    {
+                        //推片至恒温培养箱
+                        if (dt > (startTime.AddSeconds(60)))//轴一到培养位置故障
+                        {
+                            if (FaultDiagnosis("A10"))
+                            {
+                                Cmd.CommunicateDp(0x11, 0);//轴一停止运行
+                                AbnormalStop();
+                            }
+                        }
+                    }
+                    else if (bStep == 17)
+                    {
+                        //启动恒温
+                        double seconds = Convert.ToInt16(Param.ThermostaticCultureTime) * 60;
+                        label30.Text = "恒温培养倒计时:\r\n" + Tools.GetNowTimeSpanSec(startTime.AddSeconds(seconds), dt) + " 秒";
+                        if (dt > (startTime.AddSeconds(seconds)))
+                        {
+                            label30.Text = "无数据";
+                            DebOutPut.DebLog("恒温培养时间已达标");
+                            timer1.Start();
+                            Timer2Stop();
+                        }
+                    }
+                    //计算滴加培养液时间是否达到
+                    else if (bStep == 10)
+                    {
+                        Timer6Stop();//终止恒温仓温度读取 
+                        //终止恒温(10秒时间)
+                        double seconds = 10;
+                        label30.Text = "终止恒温培养倒计时:\r\n" + Tools.GetNowTimeSpanSec(startTime.AddSeconds(seconds), dt) + " 秒";
+                        if (dt > (startTime.AddSeconds(seconds)))
+                        {
+                            label30.Text = "无数据";
+                            lblTemperature.Text = "无数据";
+                            timer1.Start();
+                            Timer2Stop();
                         }
                     }
                     //计算轴一到拍照位置时间是否超时
@@ -7467,7 +7599,7 @@ namespace BZ10
                         }
                     }
                     //计算拍照过程中轴三回到X9位置时间是否超时
-                    else if (bStep == 15)
+                    else if (bStep == 18)
                     {
                         if (dt > (startTime.AddSeconds(60)))//轴三对焦
                         {
@@ -7570,7 +7702,7 @@ namespace BZ10
                         return;
                     }
                     DebOutPut.DebLog("已就位");
-                    locaiton = 11;
+                    locaiton = 7;
                     Timer3Stop();//查询状态成功，准备就绪
                     DebOutPut.DebLog("页面初始化标志：" + nFinishStep);
                     DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "页面初始化标志：" + nFinishStep);
@@ -7895,7 +8027,7 @@ namespace BZ10
                     {
                         string selectPicPath = Path.Combine(Application.StartupPath, "GrabImg");
                         string selectPicName = time.Replace("/", "").Replace("-", "").Replace(" ", "").Replace(":", "");
-                        selectPicPath = Path.Combine(selectPicPath, selectPicName + ".bmp");
+                        selectPicPath = Path.Combine(selectPicPath, selectPicName + ".jpg");
                         MessageBox.Show(this, "删除数据成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         UpdateListBoxItem();
                         if (File.Exists(selectPicPath))
@@ -8616,7 +8748,6 @@ namespace BZ10
             Timer2Stop();
             Timer3Stop();
             Timer4Stop();
-            Timer6Stop();
             serialPort1.Close();
             serialPort2.Close();
             serialPort3.Close();
@@ -8725,38 +8856,29 @@ namespace BZ10
             }
         }
 
-
+        /// <summary>
+        /// 恒温仓温度读取
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timer6_Elapsed(object sender, EventArgs e)
         {
             try
             {
                 if (Interlocked.Exchange(ref inTimer6, 1) == 0)
                 {
-                    double val = 0;
-                    val = getHj((byte)0x01);
-                    if (val != 65535)
+                    byte[] ret = Cmd.CommunicateDp(0xB0, 0);
+                    if (ret == null || ret[0] != 0xFF)
                     {
-                        wd = val;
-                        lb_wd.Text = String.Format("温度:{0:N1}℃", val);
+                        DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "恒温仓温度读取失败！");
+                        return;
                     }
-                    else
+                    int retValue = (ret[5] << 24) | (ret[6] << 16) | (ret[7] << 8) | ret[8];
+                    this.Invoke(new EventHandler(delegate
                     {
-                        lb_wd.Text = "温度:---";
-                    }
-                    val = getHj((byte)0x02);
-                    if (val != 65535)
-                    {
-                        lb_sd.Text = String.Format("湿度:{0:N1}%", val);
-                        sd = val;
-                    }
-                    else
-                        lb_sd.Text = "湿度:---";
+                        lblTemperature.Text = string.Format("{0:F1}℃", retValue / 10.0);
+                    }));
 
-                    val = getHj((byte)0x04);
-                    if (val != 65535)
-                        lb_gz.Text = "光照:" + Convert.ToInt64(val).ToString() + " lux";
-                    else
-                        lb_gz.Text = "光照:---";
                     Interlocked.Exchange(ref inTimer6, 0);
                 }
             }
@@ -9033,7 +9155,7 @@ namespace BZ10
 
                 string imagePath = Param.BasePath + "\\GrabImg\\";
                 DirectoryInfo file = new DirectoryInfo(imagePath);
-                FileInfo[] fileInfos = file.GetFiles("*.bmp");
+                FileInfo[] fileInfos = file.GetFiles("*.jpg");
                 DebOutPut.DebLog("图库中图像总数:" + fileInfos.Length);
                 for (int i = 0; i < fileInfos.Length; i++)
                 {
@@ -9099,6 +9221,12 @@ namespace BZ10
         /// </summary>
         public void ReadConfig()
         {
+            if (!string.IsNullOrEmpty(Param.LogoPictureName))
+            {
+                string imagePath = Param.BasePath + "\\GrabImg\\" + Param.LogoPictureName;
+                Image image = Image.FromFile(imagePath);
+                pbLogo.Image = image;
+            }
             this.txt_IP.Text = Param.UploadIP;
             this.txt_Port.Text = Param.UploadPort;
             this.txt_Hour.Text = Param.CollectHour;
@@ -9188,10 +9316,10 @@ namespace BZ10
             {
                 this.CbSysVersion.Text = "普通版";
             }
-            else if (Param.version == "2")
-            {
-                this.CbSysVersion.Text = "定制版";
-            }
+            //else if (Param.version == "2")
+            //{
+            //    this.CbSysVersion.Text = "定制版";
+            //}
             this.TxtClearCount.Text = Param.clearCount;
             this.TxtLeftMaxSteps.Text = Param.leftMaxSteps;
             this.TxtRightMaxSteps.Text = Param.rightMaxSteps;
@@ -9236,6 +9364,9 @@ namespace BZ10
             else if (Param.recoveryDevice == "1")
                 this.CbRecoveryDevice.Text = "70mm轴";
             this.TxtDropsTime.Text = Param.dropTime;
+
+            txtCultureTemperature.Text = Param.CultureTemperature;
+            txtThermostaticCultureTime.Text = Param.ThermostaticCultureTime;
         }
 
         /// <summary>
@@ -9314,8 +9445,8 @@ namespace BZ10
                 currSysVersion = "0";
             else if (this.CbSysVersion.Text == "普通版")
                 currSysVersion = "1";
-            else if (this.CbSysVersion.Text == "定制版")
-                currSysVersion = "2";
+            //else if (this.CbSysVersion.Text == "定制版")
+            //    currSysVersion = "2";
             //通讯方式
             string NetworkCommunication = Param.Read_ConfigParam(configfileName, "Config", "NetworkCommunication");
             string currNetworkCommunication = this.cbNetworkCommunication.SelectedIndex.ToString();
@@ -9337,7 +9468,10 @@ namespace BZ10
                 currRecoveryDevice = "0";
             else if (this.CbRecoveryDevice.Text == "70mm轴")
                 currRecoveryDevice = "1";
-            if (this.TxtMainCmd.Text.Trim() != minCom || this.TxtGPSCmd.Text.Trim() != gpsCom || this.TxtHJCmd.Text.Trim() != hjCom || this.TxtViceCmd.Text.Trim() != caCom || cameraVersion != currSelectCameraVersion || sysVersion != currSysVersion || NetworkCommunication != currNetworkCommunication || runFlag1 != currRunFlag || mapSelectionScheme != currMapSelectionScheme || FanMode != currFanMode || DripDevice != currDripDevice || RecoveryDevice != currRecoveryDevice)
+
+            string CultureTemperature = Param.Read_ConfigParam(configfileName, "Config", "CultureTemperature");
+            string ThermostaticCultureTime = Param.Read_ConfigParam(configfileName, "Config", "ThermostaticCultureTime");
+            if (this.TxtMainCmd.Text.Trim() != minCom || this.TxtGPSCmd.Text.Trim() != gpsCom || this.TxtHJCmd.Text.Trim() != hjCom || this.TxtViceCmd.Text.Trim() != caCom || cameraVersion != currSelectCameraVersion || sysVersion != currSysVersion || NetworkCommunication != currNetworkCommunication || runFlag1 != currRunFlag || mapSelectionScheme != currMapSelectionScheme || FanMode != currFanMode || DripDevice != currDripDevice || RecoveryDevice != currRecoveryDevice || txtCultureTemperature.Text.Trim() != CultureTemperature || txtThermostaticCultureTime.Text.Trim() != ThermostaticCultureTime)
             {
                 SetConfig(configfileName);
                 DialogResult dialogResult = MessageBox.Show("检测到您更改了系统关键性配置，将在系统重启之后生效。点击“确定”将立即重启本程序，点击“取消”请稍后手动重启！", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
@@ -9401,6 +9535,8 @@ namespace BZ10
             this.TxtYFirst.Enabled = isEnabled;
             this.TxtYCheck.Enabled = isEnabled;
             this.CbRecoveryDevice.Enabled = isEnabled;
+            this.txtCultureTemperature.Enabled = isEnabled;
+            this.txtThermostaticCultureTime.Enabled = isEnabled;
         }
         /// <summary>
         /// 设置配置文件
@@ -9452,8 +9588,8 @@ namespace BZ10
             string currSysVersion = "";
             if (this.CbSysVersion.Text == "普通版")
                 currSysVersion = "1";
-            else if (this.CbSysVersion.Text == "定制版")
-                currSysVersion = "2";
+            //else if (this.CbSysVersion.Text == "定制版")
+            //    currSysVersion = "2";
             else if (this.CbSysVersion.Text == "无水印版")
                 currSysVersion = "0";
 
@@ -9520,6 +9656,8 @@ namespace BZ10
             Param.Set_ConfigParm(configfileName, "Config", "isWinRestart", Param.isWinRestart);
             Param.Set_ConfigParm(configfileName, "Config", "isContinuousUpload", Param.isContinuousUpload);
             Param.Set_ConfigParm(configfileName, "Config", "SearchInterval", Param.SearchInterval);
+            Param.Set_ConfigParm(configfileName, "Config", "CultureTemperature", txtCultureTemperature.Text);
+            Param.Set_ConfigParm(configfileName, "Config", "ThermostaticCultureTime", txtThermostaticCultureTime.Text);
         }
 
 
@@ -9613,6 +9751,28 @@ namespace BZ10
             Param.Set_ConfigParm(configfileName, "Config", "work3", work3);
             Param.Set_ConfigParm(configfileName, "Config", "work4", work4);
             Param.Set_ConfigParm(configfileName, "Config", "work5", work5);
+
+            //发送时间段
+            List<object> listTimes = new List<object>()
+            {
+                new time1Model(){ time1=work1},
+                new time2Model(){ time2=work2},
+                new time3Model(){ time3=work3},
+                new time4Model(){ time4=work4},
+                new time5Model(){ time5=work5}
+            };
+            if (Param.NetworkCommunication == "0")
+            {
+                tcpclient.sendtimeControl(135, "", listTimes);
+                if (Param.IsTransfer == "1")
+                {
+                    transferClient.sendtimeControl(135, "", listTimes);
+                }
+            }
+            else if (Param.NetworkCommunication == "2")
+            {
+                mqttClient.sendtimeControl(135, "", listTimes);
+            }
         }
 
 
@@ -9845,6 +10005,25 @@ namespace BZ10
             buttonX19.Enabled = true;
         }
 
+        private void pbLogo_DoubleClick(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image|*.jpg;*.png";
+            openFileDialog.RestoreDirectory = true;
+            string resultFile = "";
 
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                resultFile = openFileDialog.FileName;
+                Image image = Image.FromFile(resultFile);
+                string fileName = "logo" + Path.GetExtension(resultFile);
+                pbLogo.Image.Dispose();
+                if (Param.SaveImage(image, fileName))
+                {
+                    pbLogo.Image = image;
+                    Param.Set_ConfigParm(configfileName, "Config", "LogoPictureName", fileName);
+                }
+            }
+        }
     }
 }

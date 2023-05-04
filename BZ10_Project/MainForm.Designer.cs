@@ -101,38 +101,30 @@ namespace BZ10
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox15 = new System.Windows.Forms.GroupBox();
             this.label30 = new System.Windows.Forms.Label();
-            this.cb_Group2 = new System.Windows.Forms.GroupBox();
-            this.lb_yk = new System.Windows.Forms.Label();
-            this.lb_gz = new System.Windows.Forms.Label();
             this.cb_Group1 = new System.Windows.Forms.GroupBox();
-            this.lb_sd = new System.Windows.Forms.Label();
-            this.lb_wd = new System.Windows.Forms.Label();
+            this.lblTemperature = new System.Windows.Forms.Label();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.label26 = new System.Windows.Forms.Label();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.label25 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.pictureBox18 = new System.Windows.Forms.PictureBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.pictureBox11 = new System.Windows.Forms.PictureBox();
+            this.pictureBox13 = new System.Windows.Forms.PictureBox();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
-            this.pictureBox17 = new System.Windows.Forms.PictureBox();
             this.label16 = new System.Windows.Forms.Label();
-            this.pictureBox16 = new System.Windows.Forms.PictureBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.pictureBox15 = new System.Windows.Forms.PictureBox();
-            this.pictureBox6 = new System.Windows.Forms.PictureBox();
-            this.pictureBox14 = new System.Windows.Forms.PictureBox();
-            this.pictureBox7 = new System.Windows.Forms.PictureBox();
-            this.pictureBox13 = new System.Windows.Forms.PictureBox();
-            this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.pictureBox12 = new System.Windows.Forms.PictureBox();
-            this.pictureBox9 = new System.Windows.Forms.PictureBox();
-            this.pictureBox11 = new System.Windows.Forms.PictureBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.pictureBox6 = new System.Windows.Forms.PictureBox();
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
+            this.pictureBox7 = new System.Windows.Forms.PictureBox();
+            this.pictureBox9 = new System.Windows.Forms.PictureBox();
+            this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.label21 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -168,6 +160,12 @@ namespace BZ10
             this.buttonX18 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox20 = new System.Windows.Forms.GroupBox();
+            this.label68 = new System.Windows.Forms.Label();
+            this.txtThermostaticCultureTime = new System.Windows.Forms.TextBox();
+            this.lblThermostaticCultureTime = new System.Windows.Forms.Label();
+            this.label70 = new System.Windows.Forms.Label();
+            this.txtCultureTemperature = new System.Windows.Forms.TextBox();
+            this.label71 = new System.Windows.Forms.Label();
             this.cbNetworkCommunication = new System.Windows.Forms.ComboBox();
             this.label67 = new System.Windows.Forms.Label();
             this.label65 = new System.Windows.Forms.Label();
@@ -296,7 +294,7 @@ namespace BZ10
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.serialPort2 = new System.IO.Ports.SerialPort(this.components);
             this.serialPort3 = new System.IO.Ports.SerialPort(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pbLogo = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
@@ -336,24 +334,18 @@ namespace BZ10
             this.groupBox10.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox15.SuspendLayout();
-            this.cb_Group2.SuspendLayout();
             this.cb_Group1.SuspendLayout();
             this.groupBox13.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox18)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox17)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox16)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox15)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox14)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox13)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox13)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -366,7 +358,7 @@ namespace BZ10
             this.groupBox14.SuspendLayout();
             this.groupBox20.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.panel1.SuspendLayout();
@@ -1296,7 +1288,6 @@ namespace BZ10
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(241)))), ((int)(((byte)(255)))));
             this.groupBox1.Controls.Add(this.groupBox15);
-            this.groupBox1.Controls.Add(this.cb_Group2);
             this.groupBox1.Controls.Add(this.cb_Group1);
             this.groupBox1.Controls.Add(this.groupBox13);
             this.groupBox1.Controls.Add(this.groupBox9);
@@ -1335,71 +1326,26 @@ namespace BZ10
             this.label30.TabIndex = 1;
             this.label30.Text = "无数据";
             // 
-            // cb_Group2
-            // 
-            this.cb_Group2.Controls.Add(this.lb_yk);
-            this.cb_Group2.Controls.Add(this.lb_gz);
-            this.cb_Group2.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.cb_Group2.Location = new System.Drawing.Point(662, 28);
-            this.cb_Group2.Name = "cb_Group2";
-            this.cb_Group2.Size = new System.Drawing.Size(209, 53);
-            this.cb_Group2.TabIndex = 29;
-            this.cb_Group2.TabStop = false;
-            this.cb_Group2.Text = "外部环境";
-            this.cb_Group2.Visible = false;
-            // 
-            // lb_yk
-            // 
-            this.lb_yk.AutoSize = true;
-            this.lb_yk.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lb_yk.Location = new System.Drawing.Point(150, 26);
-            this.lb_yk.Name = "lb_yk";
-            this.lb_yk.Size = new System.Drawing.Size(56, 16);
-            this.lb_yk.TabIndex = 1;
-            this.lb_yk.Text = "无数据";
-            // 
-            // lb_gz
-            // 
-            this.lb_gz.AutoSize = true;
-            this.lb_gz.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lb_gz.Location = new System.Drawing.Point(14, 25);
-            this.lb_gz.Name = "lb_gz";
-            this.lb_gz.Size = new System.Drawing.Size(56, 16);
-            this.lb_gz.TabIndex = 0;
-            this.lb_gz.Text = "无数据";
-            // 
             // cb_Group1
             // 
-            this.cb_Group1.Controls.Add(this.lb_sd);
-            this.cb_Group1.Controls.Add(this.lb_wd);
+            this.cb_Group1.Controls.Add(this.lblTemperature);
             this.cb_Group1.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cb_Group1.Location = new System.Drawing.Point(449, 28);
             this.cb_Group1.Name = "cb_Group1";
             this.cb_Group1.Size = new System.Drawing.Size(207, 53);
             this.cb_Group1.TabIndex = 28;
             this.cb_Group1.TabStop = false;
-            this.cb_Group1.Text = "腔体环境";
-            this.cb_Group1.Visible = false;
+            this.cb_Group1.Text = "恒温仓温度";
             // 
-            // lb_sd
+            // lblTemperature
             // 
-            this.lb_sd.AutoSize = true;
-            this.lb_sd.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lb_sd.Location = new System.Drawing.Point(104, 24);
-            this.lb_sd.Name = "lb_sd";
-            this.lb_sd.Size = new System.Drawing.Size(56, 16);
-            this.lb_sd.TabIndex = 1;
-            this.lb_sd.Text = "无数据";
-            // 
-            // lb_wd
-            // 
-            this.lb_wd.AutoSize = true;
-            this.lb_wd.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lb_wd.Location = new System.Drawing.Point(14, 25);
-            this.lb_wd.Name = "lb_wd";
-            this.lb_wd.Size = new System.Drawing.Size(56, 16);
-            this.lb_wd.TabIndex = 0;
-            this.lb_wd.Text = "无数据";
+            this.lblTemperature.AutoSize = true;
+            this.lblTemperature.ForeColor = System.Drawing.Color.Black;
+            this.lblTemperature.Location = new System.Drawing.Point(13, 26);
+            this.lblTemperature.Name = "lblTemperature";
+            this.lblTemperature.Size = new System.Drawing.Size(56, 16);
+            this.lblTemperature.TabIndex = 0;
+            this.lblTemperature.Text = "无数据";
             // 
             // groupBox13
             // 
@@ -1458,26 +1404,22 @@ namespace BZ10
             // 
             // groupBox8
             // 
-            this.groupBox8.Controls.Add(this.pictureBox18);
+            this.groupBox8.Controls.Add(this.label18);
+            this.groupBox8.Controls.Add(this.pictureBox11);
+            this.groupBox8.Controls.Add(this.pictureBox13);
             this.groupBox8.Controls.Add(this.label11);
             this.groupBox8.Controls.Add(this.label12);
             this.groupBox8.Controls.Add(this.label13);
             this.groupBox8.Controls.Add(this.label14);
             this.groupBox8.Controls.Add(this.label15);
-            this.groupBox8.Controls.Add(this.pictureBox17);
             this.groupBox8.Controls.Add(this.label16);
-            this.groupBox8.Controls.Add(this.pictureBox16);
-            this.groupBox8.Controls.Add(this.label17);
-            this.groupBox8.Controls.Add(this.pictureBox15);
-            this.groupBox8.Controls.Add(this.pictureBox6);
-            this.groupBox8.Controls.Add(this.pictureBox14);
-            this.groupBox8.Controls.Add(this.pictureBox7);
-            this.groupBox8.Controls.Add(this.pictureBox13);
-            this.groupBox8.Controls.Add(this.pictureBox8);
             this.groupBox8.Controls.Add(this.pictureBox12);
-            this.groupBox8.Controls.Add(this.pictureBox9);
-            this.groupBox8.Controls.Add(this.pictureBox11);
+            this.groupBox8.Controls.Add(this.label17);
+            this.groupBox8.Controls.Add(this.pictureBox6);
             this.groupBox8.Controls.Add(this.pictureBox10);
+            this.groupBox8.Controls.Add(this.pictureBox7);
+            this.groupBox8.Controls.Add(this.pictureBox9);
+            this.groupBox8.Controls.Add(this.pictureBox8);
             this.groupBox8.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox8.Location = new System.Drawing.Point(10, 86);
             this.groupBox8.Name = "groupBox8";
@@ -1486,15 +1428,36 @@ namespace BZ10
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "运行流程";
             // 
-            // pictureBox18
+            // label18
             // 
-            this.pictureBox18.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox18.Image")));
-            this.pictureBox18.Location = new System.Drawing.Point(575, 52);
-            this.pictureBox18.Name = "pictureBox18";
-            this.pictureBox18.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox18.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox18.TabIndex = 20;
-            this.pictureBox18.TabStop = false;
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label18.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label18.Location = new System.Drawing.Point(410, 29);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(76, 16);
+            this.label18.TabIndex = 21;
+            this.label18.Text = "恒温培养";
+            // 
+            // pictureBox11
+            // 
+            this.pictureBox11.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox11.Image")));
+            this.pictureBox11.Location = new System.Drawing.Point(422, 52);
+            this.pictureBox11.Name = "pictureBox11";
+            this.pictureBox11.Size = new System.Drawing.Size(49, 46);
+            this.pictureBox11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox11.TabIndex = 22;
+            this.pictureBox11.TabStop = false;
+            // 
+            // pictureBox13
+            // 
+            this.pictureBox13.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox13.Image")));
+            this.pictureBox13.Location = new System.Drawing.Point(579, 52);
+            this.pictureBox13.Name = "pictureBox13";
+            this.pictureBox13.Size = new System.Drawing.Size(49, 46);
+            this.pictureBox13.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox13.TabIndex = 20;
+            this.pictureBox13.TabStop = false;
             // 
             // label11
             // 
@@ -1512,7 +1475,7 @@ namespace BZ10
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label12.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label12.Location = new System.Drawing.Point(110, 29);
+            this.label12.Location = new System.Drawing.Point(99, 29);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(42, 16);
             this.label12.TabIndex = 2;
@@ -1523,7 +1486,7 @@ namespace BZ10
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label13.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label13.Location = new System.Drawing.Point(191, 29);
+            this.label13.Location = new System.Drawing.Point(168, 29);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(59, 16);
             this.label13.TabIndex = 3;
@@ -1534,7 +1497,7 @@ namespace BZ10
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label14.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label14.Location = new System.Drawing.Point(298, 29);
+            this.label14.Location = new System.Drawing.Point(259, 29);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(42, 16);
             this.label14.TabIndex = 4;
@@ -1545,63 +1508,43 @@ namespace BZ10
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label15.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label15.Location = new System.Drawing.Point(390, 29);
+            this.label15.Location = new System.Drawing.Point(336, 29);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(59, 16);
             this.label15.TabIndex = 5;
             this.label15.Text = "培养液";
-            // 
-            // pictureBox17
-            // 
-            this.pictureBox17.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox17.Image")));
-            this.pictureBox17.Location = new System.Drawing.Point(532, 52);
-            this.pictureBox17.Name = "pictureBox17";
-            this.pictureBox17.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox17.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox17.TabIndex = 19;
-            this.pictureBox17.TabStop = false;
             // 
             // label16
             // 
             this.label16.AutoSize = true;
             this.label16.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label16.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label16.Location = new System.Drawing.Point(488, 29);
+            this.label16.Location = new System.Drawing.Point(508, 29);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(42, 16);
             this.label16.TabIndex = 6;
             this.label16.Text = "拍照";
             // 
-            // pictureBox16
+            // pictureBox12
             // 
-            this.pictureBox16.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox16.Image")));
-            this.pictureBox16.Location = new System.Drawing.Point(483, 52);
-            this.pictureBox16.Name = "pictureBox16";
-            this.pictureBox16.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox16.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox16.TabIndex = 18;
-            this.pictureBox16.TabStop = false;
+            this.pictureBox12.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox12.Image")));
+            this.pictureBox12.Location = new System.Drawing.Point(503, 52);
+            this.pictureBox12.Name = "pictureBox12";
+            this.pictureBox12.Size = new System.Drawing.Size(49, 46);
+            this.pictureBox12.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox12.TabIndex = 18;
+            this.pictureBox12.TabStop = false;
             // 
             // label17
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label17.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label17.Location = new System.Drawing.Point(584, 29);
+            this.label17.Location = new System.Drawing.Point(588, 29);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(42, 16);
             this.label17.TabIndex = 7;
             this.label17.Text = "回收";
-            // 
-            // pictureBox15
-            // 
-            this.pictureBox15.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox15.Image")));
-            this.pictureBox15.Location = new System.Drawing.Point(436, 52);
-            this.pictureBox15.Name = "pictureBox15";
-            this.pictureBox15.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox15.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox15.TabIndex = 17;
-            this.pictureBox15.TabStop = false;
             // 
             // pictureBox6
             // 
@@ -1613,85 +1556,45 @@ namespace BZ10
             this.pictureBox6.TabIndex = 8;
             this.pictureBox6.TabStop = false;
             // 
-            // pictureBox14
+            // pictureBox10
             // 
-            this.pictureBox14.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox14.Image")));
-            this.pictureBox14.Location = new System.Drawing.Point(390, 52);
-            this.pictureBox14.Name = "pictureBox14";
-            this.pictureBox14.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox14.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox14.TabIndex = 16;
-            this.pictureBox14.TabStop = false;
+            this.pictureBox10.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox10.Image")));
+            this.pictureBox10.Location = new System.Drawing.Point(338, 52);
+            this.pictureBox10.Name = "pictureBox10";
+            this.pictureBox10.Size = new System.Drawing.Size(49, 46);
+            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox10.TabIndex = 16;
+            this.pictureBox10.TabStop = false;
             // 
             // pictureBox7
             // 
             this.pictureBox7.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox7.Image")));
-            this.pictureBox7.Location = new System.Drawing.Point(58, 52);
+            this.pictureBox7.Location = new System.Drawing.Point(91, 52);
             this.pictureBox7.Name = "pictureBox7";
             this.pictureBox7.Size = new System.Drawing.Size(49, 46);
             this.pictureBox7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox7.TabIndex = 9;
+            this.pictureBox7.TabIndex = 10;
             this.pictureBox7.TabStop = false;
-            // 
-            // pictureBox13
-            // 
-            this.pictureBox13.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox13.Image")));
-            this.pictureBox13.Location = new System.Drawing.Point(341, 52);
-            this.pictureBox13.Name = "pictureBox13";
-            this.pictureBox13.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox13.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox13.TabIndex = 15;
-            this.pictureBox13.TabStop = false;
-            // 
-            // pictureBox8
-            // 
-            this.pictureBox8.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox8.Image")));
-            this.pictureBox8.Location = new System.Drawing.Point(102, 52);
-            this.pictureBox8.Name = "pictureBox8";
-            this.pictureBox8.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox8.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox8.TabIndex = 10;
-            this.pictureBox8.TabStop = false;
-            // 
-            // pictureBox12
-            // 
-            this.pictureBox12.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox12.Image")));
-            this.pictureBox12.Location = new System.Drawing.Point(292, 52);
-            this.pictureBox12.Name = "pictureBox12";
-            this.pictureBox12.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox12.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox12.TabIndex = 14;
-            this.pictureBox12.TabStop = false;
             // 
             // pictureBox9
             // 
             this.pictureBox9.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox9.Image")));
-            this.pictureBox9.Location = new System.Drawing.Point(151, 52);
+            this.pictureBox9.Location = new System.Drawing.Point(253, 52);
             this.pictureBox9.Name = "pictureBox9";
             this.pictureBox9.Size = new System.Drawing.Size(49, 46);
             this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox9.TabIndex = 11;
+            this.pictureBox9.TabIndex = 14;
             this.pictureBox9.TabStop = false;
             // 
-            // pictureBox11
+            // pictureBox8
             // 
-            this.pictureBox11.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox11.Image")));
-            this.pictureBox11.Location = new System.Drawing.Point(243, 52);
-            this.pictureBox11.Name = "pictureBox11";
-            this.pictureBox11.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox11.TabIndex = 13;
-            this.pictureBox11.TabStop = false;
-            // 
-            // pictureBox10
-            // 
-            this.pictureBox10.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox10.Image")));
-            this.pictureBox10.Location = new System.Drawing.Point(194, 52);
-            this.pictureBox10.Name = "pictureBox10";
-            this.pictureBox10.Size = new System.Drawing.Size(49, 46);
-            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox10.TabIndex = 12;
-            this.pictureBox10.TabStop = false;
+            this.pictureBox8.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox8.Image")));
+            this.pictureBox8.Location = new System.Drawing.Point(171, 52);
+            this.pictureBox8.Name = "pictureBox8";
+            this.pictureBox8.Size = new System.Drawing.Size(49, 46);
+            this.pictureBox8.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox8.TabIndex = 12;
+            this.pictureBox8.TabStop = false;
             // 
             // groupBox7
             // 
@@ -2081,6 +1984,12 @@ namespace BZ10
             // 
             // groupBox20
             // 
+            this.groupBox20.Controls.Add(this.label68);
+            this.groupBox20.Controls.Add(this.txtThermostaticCultureTime);
+            this.groupBox20.Controls.Add(this.lblThermostaticCultureTime);
+            this.groupBox20.Controls.Add(this.label70);
+            this.groupBox20.Controls.Add(this.txtCultureTemperature);
+            this.groupBox20.Controls.Add(this.label71);
             this.groupBox20.Controls.Add(this.cbNetworkCommunication);
             this.groupBox20.Controls.Add(this.label67);
             this.groupBox20.Controls.Add(this.label65);
@@ -2202,6 +2111,64 @@ namespace BZ10
             this.groupBox20.Size = new System.Drawing.Size(803, 563);
             this.groupBox20.TabIndex = 51;
             this.groupBox20.TabStop = false;
+            // 
+            // label68
+            // 
+            this.label68.AutoSize = true;
+            this.label68.Font = new System.Drawing.Font("宋体", 9F);
+            this.label68.Location = new System.Drawing.Point(572, 179);
+            this.label68.Name = "label68";
+            this.label68.Size = new System.Drawing.Size(17, 12);
+            this.label68.TabIndex = 218;
+            this.label68.Text = "分";
+            // 
+            // txtThermostaticCultureTime
+            // 
+            this.txtThermostaticCultureTime.Enabled = false;
+            this.txtThermostaticCultureTime.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtThermostaticCultureTime.Location = new System.Drawing.Point(490, 171);
+            this.txtThermostaticCultureTime.Name = "txtThermostaticCultureTime";
+            this.txtThermostaticCultureTime.Size = new System.Drawing.Size(81, 26);
+            this.txtThermostaticCultureTime.TabIndex = 217;
+            // 
+            // lblThermostaticCultureTime
+            // 
+            this.lblThermostaticCultureTime.AutoSize = true;
+            this.lblThermostaticCultureTime.Font = new System.Drawing.Font("宋体", 12F);
+            this.lblThermostaticCultureTime.Location = new System.Drawing.Point(415, 174);
+            this.lblThermostaticCultureTime.Name = "lblThermostaticCultureTime";
+            this.lblThermostaticCultureTime.Size = new System.Drawing.Size(80, 16);
+            this.lblThermostaticCultureTime.TabIndex = 216;
+            this.lblThermostaticCultureTime.Text = "恒温时间:";
+            // 
+            // label70
+            // 
+            this.label70.AutoSize = true;
+            this.label70.Font = new System.Drawing.Font("宋体", 9F);
+            this.label70.Location = new System.Drawing.Point(572, 133);
+            this.label70.Name = "label70";
+            this.label70.Size = new System.Drawing.Size(17, 12);
+            this.label70.TabIndex = 215;
+            this.label70.Text = "℃";
+            // 
+            // txtCultureTemperature
+            // 
+            this.txtCultureTemperature.Enabled = false;
+            this.txtCultureTemperature.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtCultureTemperature.Location = new System.Drawing.Point(490, 125);
+            this.txtCultureTemperature.Name = "txtCultureTemperature";
+            this.txtCultureTemperature.Size = new System.Drawing.Size(81, 26);
+            this.txtCultureTemperature.TabIndex = 214;
+            // 
+            // label71
+            // 
+            this.label71.AutoSize = true;
+            this.label71.Font = new System.Drawing.Font("宋体", 12F);
+            this.label71.Location = new System.Drawing.Point(415, 128);
+            this.label71.Name = "label71";
+            this.label71.Size = new System.Drawing.Size(80, 16);
+            this.label71.TabIndex = 213;
+            this.label71.Text = "恒温温度:";
             // 
             // cbNetworkCommunication
             // 
@@ -2330,7 +2297,7 @@ namespace BZ10
             // 
             this.label129.AutoSize = true;
             this.label129.Font = new System.Drawing.Font("宋体", 9F);
-            this.label129.Location = new System.Drawing.Point(773, 136);
+            this.label129.Location = new System.Drawing.Point(773, 200);
             this.label129.Name = "label129";
             this.label129.Size = new System.Drawing.Size(17, 12);
             this.label129.TabIndex = 203;
@@ -2340,7 +2307,7 @@ namespace BZ10
             // 
             this.TxtYCorrecting.Enabled = false;
             this.TxtYCorrecting.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYCorrecting.Location = new System.Drawing.Point(691, 130);
+            this.TxtYCorrecting.Location = new System.Drawing.Point(691, 194);
             this.TxtYCorrecting.Name = "TxtYCorrecting";
             this.TxtYCorrecting.Size = new System.Drawing.Size(81, 26);
             this.TxtYCorrecting.TabIndex = 202;
@@ -2350,7 +2317,7 @@ namespace BZ10
             // 
             this.label130.AutoSize = true;
             this.label130.Font = new System.Drawing.Font("宋体", 12F);
-            this.label130.Location = new System.Drawing.Point(615, 133);
+            this.label130.Location = new System.Drawing.Point(615, 197);
             this.label130.Name = "label130";
             this.label130.Size = new System.Drawing.Size(80, 16);
             this.label130.TabIndex = 201;
@@ -2360,7 +2327,7 @@ namespace BZ10
             // 
             this.label127.AutoSize = true;
             this.label127.Font = new System.Drawing.Font("宋体", 9F);
-            this.label127.Location = new System.Drawing.Point(573, 271);
+            this.label127.Location = new System.Drawing.Point(573, 366);
             this.label127.Name = "label127";
             this.label127.Size = new System.Drawing.Size(17, 12);
             this.label127.TabIndex = 200;
@@ -2370,7 +2337,7 @@ namespace BZ10
             // 
             this.TxtXCorrecting.Enabled = false;
             this.TxtXCorrecting.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtXCorrecting.Location = new System.Drawing.Point(490, 264);
+            this.TxtXCorrecting.Location = new System.Drawing.Point(490, 359);
             this.TxtXCorrecting.Name = "TxtXCorrecting";
             this.TxtXCorrecting.Size = new System.Drawing.Size(81, 26);
             this.TxtXCorrecting.TabIndex = 199;
@@ -2380,7 +2347,7 @@ namespace BZ10
             // 
             this.label128.AutoSize = true;
             this.label128.Font = new System.Drawing.Font("宋体", 12F);
-            this.label128.Location = new System.Drawing.Point(415, 267);
+            this.label128.Location = new System.Drawing.Point(415, 362);
             this.label128.Name = "label128";
             this.label128.Size = new System.Drawing.Size(80, 16);
             this.label128.TabIndex = 198;
@@ -2390,7 +2357,7 @@ namespace BZ10
             // 
             this.TxtYInterval.Enabled = false;
             this.TxtYInterval.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYInterval.Location = new System.Drawing.Point(691, 266);
+            this.TxtYInterval.Location = new System.Drawing.Point(691, 330);
             this.TxtYInterval.Name = "TxtYInterval";
             this.TxtYInterval.Size = new System.Drawing.Size(81, 26);
             this.TxtYInterval.TabIndex = 197;
@@ -2400,7 +2367,7 @@ namespace BZ10
             // 
             this.label125.AutoSize = true;
             this.label125.Font = new System.Drawing.Font("宋体", 9F);
-            this.label125.Location = new System.Drawing.Point(773, 273);
+            this.label125.Location = new System.Drawing.Point(773, 337);
             this.label125.Name = "label125";
             this.label125.Size = new System.Drawing.Size(17, 12);
             this.label125.TabIndex = 196;
@@ -2410,7 +2377,7 @@ namespace BZ10
             // 
             this.label126.AutoSize = true;
             this.label126.Font = new System.Drawing.Font("宋体", 12F);
-            this.label126.Location = new System.Drawing.Point(615, 269);
+            this.label126.Location = new System.Drawing.Point(615, 333);
             this.label126.Name = "label126";
             this.label126.Size = new System.Drawing.Size(80, 16);
             this.label126.TabIndex = 195;
@@ -2420,7 +2387,7 @@ namespace BZ10
             // 
             this.TxtYFirst.Enabled = false;
             this.TxtYFirst.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYFirst.Location = new System.Drawing.Point(691, 407);
+            this.TxtYFirst.Location = new System.Drawing.Point(691, 462);
             this.TxtYFirst.Name = "TxtYFirst";
             this.TxtYFirst.Size = new System.Drawing.Size(81, 26);
             this.TxtYFirst.TabIndex = 194;
@@ -2430,7 +2397,7 @@ namespace BZ10
             // 
             this.label117.AutoSize = true;
             this.label117.Font = new System.Drawing.Font("宋体", 12F);
-            this.label117.Location = new System.Drawing.Point(616, 410);
+            this.label117.Location = new System.Drawing.Point(616, 465);
             this.label117.Name = "label117";
             this.label117.Size = new System.Drawing.Size(80, 16);
             this.label117.TabIndex = 193;
@@ -2440,7 +2407,7 @@ namespace BZ10
             // 
             this.label118.AutoSize = true;
             this.label118.Font = new System.Drawing.Font("宋体", 9F);
-            this.label118.Location = new System.Drawing.Point(773, 414);
+            this.label118.Location = new System.Drawing.Point(773, 469);
             this.label118.Name = "label118";
             this.label118.Size = new System.Drawing.Size(17, 12);
             this.label118.TabIndex = 192;
@@ -2450,7 +2417,7 @@ namespace BZ10
             // 
             this.label119.AutoSize = true;
             this.label119.Font = new System.Drawing.Font("宋体", 9F);
-            this.label119.Location = new System.Drawing.Point(773, 366);
+            this.label119.Location = new System.Drawing.Point(773, 426);
             this.label119.Name = "label119";
             this.label119.Size = new System.Drawing.Size(17, 12);
             this.label119.TabIndex = 191;
@@ -2460,7 +2427,7 @@ namespace BZ10
             // 
             this.TxtRightMaxSteps.Enabled = false;
             this.TxtRightMaxSteps.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtRightMaxSteps.Location = new System.Drawing.Point(490, 357);
+            this.TxtRightMaxSteps.Location = new System.Drawing.Point(490, 452);
             this.TxtRightMaxSteps.Name = "TxtRightMaxSteps";
             this.TxtRightMaxSteps.Size = new System.Drawing.Size(81, 26);
             this.TxtRightMaxSteps.TabIndex = 124;
@@ -2470,7 +2437,7 @@ namespace BZ10
             // 
             this.label92.AutoSize = true;
             this.label92.Font = new System.Drawing.Font("宋体", 12F);
-            this.label92.Location = new System.Drawing.Point(415, 360);
+            this.label92.Location = new System.Drawing.Point(415, 455);
             this.label92.Name = "label92";
             this.label92.Size = new System.Drawing.Size(80, 16);
             this.label92.TabIndex = 123;
@@ -2480,7 +2447,7 @@ namespace BZ10
             // 
             this.label120.AutoSize = true;
             this.label120.Font = new System.Drawing.Font("宋体", 9F);
-            this.label120.Location = new System.Drawing.Point(774, 318);
+            this.label120.Location = new System.Drawing.Point(774, 382);
             this.label120.Name = "label120";
             this.label120.Size = new System.Drawing.Size(17, 12);
             this.label120.TabIndex = 190;
@@ -2490,7 +2457,7 @@ namespace BZ10
             // 
             this.label91.AutoSize = true;
             this.label91.Font = new System.Drawing.Font("宋体", 9F);
-            this.label91.Location = new System.Drawing.Point(572, 364);
+            this.label91.Location = new System.Drawing.Point(572, 459);
             this.label91.Name = "label91";
             this.label91.Size = new System.Drawing.Size(17, 12);
             this.label91.TabIndex = 125;
@@ -2500,7 +2467,7 @@ namespace BZ10
             // 
             this.TxtYNageCom.Enabled = false;
             this.TxtYNageCom.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYNageCom.Location = new System.Drawing.Point(691, 359);
+            this.TxtYNageCom.Location = new System.Drawing.Point(691, 419);
             this.TxtYNageCom.Name = "TxtYNageCom";
             this.TxtYNageCom.Size = new System.Drawing.Size(81, 26);
             this.TxtYNageCom.TabIndex = 189;
@@ -2510,7 +2477,7 @@ namespace BZ10
             // 
             this.TxtYJustCom.Enabled = false;
             this.TxtYJustCom.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYJustCom.Location = new System.Drawing.Point(691, 311);
+            this.TxtYJustCom.Location = new System.Drawing.Point(691, 375);
             this.TxtYJustCom.Name = "TxtYJustCom";
             this.TxtYJustCom.Size = new System.Drawing.Size(81, 26);
             this.TxtYJustCom.TabIndex = 188;
@@ -2520,7 +2487,7 @@ namespace BZ10
             // 
             this.label121.AutoSize = true;
             this.label121.Font = new System.Drawing.Font("宋体", 12F);
-            this.label121.Location = new System.Drawing.Point(616, 362);
+            this.label121.Location = new System.Drawing.Point(616, 422);
             this.label121.Name = "label121";
             this.label121.Size = new System.Drawing.Size(80, 16);
             this.label121.TabIndex = 187;
@@ -2530,7 +2497,7 @@ namespace BZ10
             // 
             this.label122.AutoSize = true;
             this.label122.Font = new System.Drawing.Font("宋体", 12F);
-            this.label122.Location = new System.Drawing.Point(615, 314);
+            this.label122.Location = new System.Drawing.Point(615, 378);
             this.label122.Name = "label122";
             this.label122.Size = new System.Drawing.Size(80, 16);
             this.label122.TabIndex = 186;
@@ -2540,7 +2507,7 @@ namespace BZ10
             // 
             this.label123.AutoSize = true;
             this.label123.Font = new System.Drawing.Font("宋体", 9F);
-            this.label123.Location = new System.Drawing.Point(773, 462);
+            this.label123.Location = new System.Drawing.Point(773, 509);
             this.label123.Name = "label123";
             this.label123.Size = new System.Drawing.Size(17, 12);
             this.label123.TabIndex = 185;
@@ -2550,7 +2517,7 @@ namespace BZ10
             // 
             this.TxtYCheck.Enabled = false;
             this.TxtYCheck.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYCheck.Location = new System.Drawing.Point(691, 455);
+            this.TxtYCheck.Location = new System.Drawing.Point(691, 502);
             this.TxtYCheck.Name = "TxtYCheck";
             this.TxtYCheck.Size = new System.Drawing.Size(81, 26);
             this.TxtYCheck.TabIndex = 184;
@@ -2560,7 +2527,7 @@ namespace BZ10
             // 
             this.label124.AutoSize = true;
             this.label124.Font = new System.Drawing.Font("宋体", 12F);
-            this.label124.Location = new System.Drawing.Point(615, 458);
+            this.label124.Location = new System.Drawing.Point(615, 505);
             this.label124.Name = "label124";
             this.label124.Size = new System.Drawing.Size(80, 16);
             this.label124.TabIndex = 183;
@@ -2570,7 +2537,7 @@ namespace BZ10
             // 
             this.label115.AutoSize = true;
             this.label115.Font = new System.Drawing.Font("宋体", 9F);
-            this.label115.Location = new System.Drawing.Point(773, 228);
+            this.label115.Location = new System.Drawing.Point(773, 292);
             this.label115.Name = "label115";
             this.label115.Size = new System.Drawing.Size(17, 12);
             this.label115.TabIndex = 182;
@@ -2580,7 +2547,7 @@ namespace BZ10
             // 
             this.TxtYNegaRange.Enabled = false;
             this.TxtYNegaRange.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYNegaRange.Location = new System.Drawing.Point(691, 221);
+            this.TxtYNegaRange.Location = new System.Drawing.Point(691, 285);
             this.TxtYNegaRange.Name = "TxtYNegaRange";
             this.TxtYNegaRange.Size = new System.Drawing.Size(81, 26);
             this.TxtYNegaRange.TabIndex = 181;
@@ -2590,7 +2557,7 @@ namespace BZ10
             // 
             this.label116.AutoSize = true;
             this.label116.Font = new System.Drawing.Font("宋体", 12F);
-            this.label116.Location = new System.Drawing.Point(615, 224);
+            this.label116.Location = new System.Drawing.Point(615, 288);
             this.label116.Name = "label116";
             this.label116.Size = new System.Drawing.Size(80, 16);
             this.label116.TabIndex = 180;
@@ -2600,7 +2567,7 @@ namespace BZ10
             // 
             this.label113.AutoSize = true;
             this.label113.Font = new System.Drawing.Font("宋体", 9F);
-            this.label113.Location = new System.Drawing.Point(773, 180);
+            this.label113.Location = new System.Drawing.Point(773, 247);
             this.label113.Name = "label113";
             this.label113.Size = new System.Drawing.Size(17, 12);
             this.label113.TabIndex = 179;
@@ -2610,7 +2577,7 @@ namespace BZ10
             // 
             this.TxtYJustRange.Enabled = false;
             this.TxtYJustRange.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtYJustRange.Location = new System.Drawing.Point(691, 173);
+            this.TxtYJustRange.Location = new System.Drawing.Point(691, 240);
             this.TxtYJustRange.Name = "TxtYJustRange";
             this.TxtYJustRange.Size = new System.Drawing.Size(81, 26);
             this.TxtYJustRange.TabIndex = 178;
@@ -2620,7 +2587,7 @@ namespace BZ10
             // 
             this.label114.AutoSize = true;
             this.label114.Font = new System.Drawing.Font("宋体", 12F);
-            this.label114.Location = new System.Drawing.Point(616, 176);
+            this.label114.Location = new System.Drawing.Point(616, 243);
             this.label114.Name = "label114";
             this.label114.Size = new System.Drawing.Size(80, 16);
             this.label114.TabIndex = 177;
@@ -2765,7 +2732,7 @@ namespace BZ10
             // 
             this.TxttranClearCount.Enabled = false;
             this.TxttranClearCount.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxttranClearCount.Location = new System.Drawing.Point(691, 37);
+            this.TxttranClearCount.Location = new System.Drawing.Point(691, 109);
             this.TxttranClearCount.Name = "TxttranClearCount";
             this.TxttranClearCount.Size = new System.Drawing.Size(81, 26);
             this.TxttranClearCount.TabIndex = 163;
@@ -2775,7 +2742,7 @@ namespace BZ10
             // 
             this.label97.AutoSize = true;
             this.label97.Font = new System.Drawing.Font("宋体", 12F);
-            this.label97.Location = new System.Drawing.Point(615, 40);
+            this.label97.Location = new System.Drawing.Point(615, 112);
             this.label97.Name = "label97";
             this.label97.Size = new System.Drawing.Size(80, 16);
             this.label97.TabIndex = 162;
@@ -2785,7 +2752,7 @@ namespace BZ10
             // 
             this.label99.AutoSize = true;
             this.label99.Font = new System.Drawing.Font("宋体", 9F);
-            this.label99.Location = new System.Drawing.Point(773, 44);
+            this.label99.Location = new System.Drawing.Point(773, 115);
             this.label99.Name = "label99";
             this.label99.Size = new System.Drawing.Size(17, 12);
             this.label99.TabIndex = 161;
@@ -2795,7 +2762,7 @@ namespace BZ10
             // 
             this.label100.AutoSize = true;
             this.label100.Font = new System.Drawing.Font("宋体", 9F);
-            this.label100.Location = new System.Drawing.Point(572, 506);
+            this.label100.Location = new System.Drawing.Point(773, 78);
             this.label100.Name = "label100";
             this.label100.Size = new System.Drawing.Size(17, 12);
             this.label100.TabIndex = 160;
@@ -2805,7 +2772,7 @@ namespace BZ10
             // 
             this.label101.AutoSize = true;
             this.label101.Font = new System.Drawing.Font("宋体", 9F);
-            this.label101.Location = new System.Drawing.Point(572, 460);
+            this.label101.Location = new System.Drawing.Point(773, 40);
             this.label101.Name = "label101";
             this.label101.Size = new System.Drawing.Size(17, 12);
             this.label101.TabIndex = 159;
@@ -2815,7 +2782,7 @@ namespace BZ10
             // 
             this.TxttranStepsMax.Enabled = false;
             this.TxttranStepsMax.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxttranStepsMax.Location = new System.Drawing.Point(490, 500);
+            this.TxttranStepsMax.Location = new System.Drawing.Point(691, 72);
             this.TxttranStepsMax.Name = "TxttranStepsMax";
             this.TxttranStepsMax.Size = new System.Drawing.Size(81, 26);
             this.TxttranStepsMax.TabIndex = 158;
@@ -2825,7 +2792,7 @@ namespace BZ10
             // 
             this.TxttranStepsMin.Enabled = false;
             this.TxttranStepsMin.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxttranStepsMin.Location = new System.Drawing.Point(490, 454);
+            this.TxttranStepsMin.Location = new System.Drawing.Point(691, 34);
             this.TxttranStepsMin.Name = "TxttranStepsMin";
             this.TxttranStepsMin.Size = new System.Drawing.Size(81, 26);
             this.TxttranStepsMin.TabIndex = 157;
@@ -2835,7 +2802,7 @@ namespace BZ10
             // 
             this.label102.AutoSize = true;
             this.label102.Font = new System.Drawing.Font("宋体", 12F);
-            this.label102.Location = new System.Drawing.Point(414, 503);
+            this.label102.Location = new System.Drawing.Point(615, 75);
             this.label102.Name = "label102";
             this.label102.Size = new System.Drawing.Size(80, 16);
             this.label102.TabIndex = 156;
@@ -2845,7 +2812,7 @@ namespace BZ10
             // 
             this.label103.AutoSize = true;
             this.label103.Font = new System.Drawing.Font("宋体", 12F);
-            this.label103.Location = new System.Drawing.Point(415, 457);
+            this.label103.Location = new System.Drawing.Point(616, 37);
             this.label103.Name = "label103";
             this.label103.Size = new System.Drawing.Size(80, 16);
             this.label103.TabIndex = 155;
@@ -2878,7 +2845,7 @@ namespace BZ10
             // 
             this.TxtClearCount.Enabled = false;
             this.TxtClearCount.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtClearCount.Location = new System.Drawing.Point(490, 219);
+            this.TxtClearCount.Location = new System.Drawing.Point(490, 314);
             this.TxtClearCount.Name = "TxtClearCount";
             this.TxtClearCount.Size = new System.Drawing.Size(81, 26);
             this.TxtClearCount.TabIndex = 144;
@@ -2888,7 +2855,7 @@ namespace BZ10
             // 
             this.label96.AutoSize = true;
             this.label96.Font = new System.Drawing.Font("宋体", 12F);
-            this.label96.Location = new System.Drawing.Point(415, 222);
+            this.label96.Location = new System.Drawing.Point(415, 317);
             this.label96.Name = "label96";
             this.label96.Size = new System.Drawing.Size(80, 16);
             this.label96.TabIndex = 143;
@@ -2918,7 +2885,7 @@ namespace BZ10
             // 
             this.label95.AutoSize = true;
             this.label95.Font = new System.Drawing.Font("宋体", 9F);
-            this.label95.Location = new System.Drawing.Point(773, 91);
+            this.label95.Location = new System.Drawing.Point(773, 156);
             this.label95.Name = "label95";
             this.label95.Size = new System.Drawing.Size(17, 12);
             this.label95.TabIndex = 131;
@@ -2928,7 +2895,7 @@ namespace BZ10
             // 
             this.TxtMoveInterval.Enabled = false;
             this.TxtMoveInterval.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtMoveInterval.Location = new System.Drawing.Point(490, 405);
+            this.TxtMoveInterval.Location = new System.Drawing.Point(490, 500);
             this.TxtMoveInterval.Name = "TxtMoveInterval";
             this.TxtMoveInterval.Size = new System.Drawing.Size(81, 26);
             this.TxtMoveInterval.TabIndex = 130;
@@ -2938,7 +2905,7 @@ namespace BZ10
             // 
             this.label93.AutoSize = true;
             this.label93.Font = new System.Drawing.Font("宋体", 9F);
-            this.label93.Location = new System.Drawing.Point(572, 411);
+            this.label93.Location = new System.Drawing.Point(572, 506);
             this.label93.Name = "label93";
             this.label93.Size = new System.Drawing.Size(17, 12);
             this.label93.TabIndex = 128;
@@ -2948,7 +2915,7 @@ namespace BZ10
             // 
             this.TxtLiftRightClearCount.Enabled = false;
             this.TxtLiftRightClearCount.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtLiftRightClearCount.Location = new System.Drawing.Point(691, 84);
+            this.TxtLiftRightClearCount.Location = new System.Drawing.Point(691, 149);
             this.TxtLiftRightClearCount.Name = "TxtLiftRightClearCount";
             this.TxtLiftRightClearCount.Size = new System.Drawing.Size(81, 26);
             this.TxtLiftRightClearCount.TabIndex = 127;
@@ -2958,7 +2925,7 @@ namespace BZ10
             // 
             this.label94.AutoSize = true;
             this.label94.Font = new System.Drawing.Font("宋体", 12F);
-            this.label94.Location = new System.Drawing.Point(414, 408);
+            this.label94.Location = new System.Drawing.Point(414, 503);
             this.label94.Name = "label94";
             this.label94.Size = new System.Drawing.Size(80, 16);
             this.label94.TabIndex = 126;
@@ -2968,7 +2935,7 @@ namespace BZ10
             // 
             this.label89.AutoSize = true;
             this.label89.Font = new System.Drawing.Font("宋体", 9F);
-            this.label89.Location = new System.Drawing.Point(573, 316);
+            this.label89.Location = new System.Drawing.Point(573, 411);
             this.label89.Name = "label89";
             this.label89.Size = new System.Drawing.Size(17, 12);
             this.label89.TabIndex = 122;
@@ -2978,7 +2945,7 @@ namespace BZ10
             // 
             this.TxtLeftMaxSteps.Enabled = false;
             this.TxtLeftMaxSteps.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtLeftMaxSteps.Location = new System.Drawing.Point(490, 310);
+            this.TxtLeftMaxSteps.Location = new System.Drawing.Point(490, 405);
             this.TxtLeftMaxSteps.Name = "TxtLeftMaxSteps";
             this.TxtLeftMaxSteps.Size = new System.Drawing.Size(81, 26);
             this.TxtLeftMaxSteps.TabIndex = 121;
@@ -2988,7 +2955,7 @@ namespace BZ10
             // 
             this.label90.AutoSize = true;
             this.label90.Font = new System.Drawing.Font("宋体", 12F);
-            this.label90.Location = new System.Drawing.Point(415, 313);
+            this.label90.Location = new System.Drawing.Point(415, 408);
             this.label90.Name = "label90";
             this.label90.Size = new System.Drawing.Size(80, 16);
             this.label90.TabIndex = 120;
@@ -3048,7 +3015,7 @@ namespace BZ10
             // 
             this.label87.AutoSize = true;
             this.label87.Font = new System.Drawing.Font("宋体", 9F);
-            this.label87.Location = new System.Drawing.Point(572, 226);
+            this.label87.Location = new System.Drawing.Point(572, 321);
             this.label87.Name = "label87";
             this.label87.Size = new System.Drawing.Size(17, 12);
             this.label87.TabIndex = 114;
@@ -3058,7 +3025,7 @@ namespace BZ10
             // 
             this.label88.AutoSize = true;
             this.label88.Font = new System.Drawing.Font("宋体", 12F);
-            this.label88.Location = new System.Drawing.Point(615, 87);
+            this.label88.Location = new System.Drawing.Point(615, 152);
             this.label88.Name = "label88";
             this.label88.Size = new System.Drawing.Size(80, 16);
             this.label88.TabIndex = 112;
@@ -3071,8 +3038,7 @@ namespace BZ10
             this.CbSysVersion.FormattingEnabled = true;
             this.CbSysVersion.Items.AddRange(new object[] {
             "无水印版",
-            "普通版",
-            "定制版"});
+            "普通版"});
             this.CbSysVersion.Location = new System.Drawing.Point(92, 353);
             this.CbSysVersion.Name = "CbSysVersion";
             this.CbSysVersion.Size = new System.Drawing.Size(81, 26);
@@ -3115,7 +3081,7 @@ namespace BZ10
             // 
             this.label49.AutoSize = true;
             this.label49.Font = new System.Drawing.Font("宋体", 9F);
-            this.label49.Location = new System.Drawing.Point(572, 178);
+            this.label49.Location = new System.Drawing.Point(572, 273);
             this.label49.Name = "label49";
             this.label49.Size = new System.Drawing.Size(17, 12);
             this.label49.TabIndex = 102;
@@ -3125,7 +3091,7 @@ namespace BZ10
             // 
             this.label48.AutoSize = true;
             this.label48.Font = new System.Drawing.Font("宋体", 9F);
-            this.label48.Location = new System.Drawing.Point(572, 132);
+            this.label48.Location = new System.Drawing.Point(572, 227);
             this.label48.Name = "label48";
             this.label48.Size = new System.Drawing.Size(17, 12);
             this.label48.TabIndex = 101;
@@ -3235,7 +3201,7 @@ namespace BZ10
             // 
             this.TxtCameraMaxSteps.Enabled = false;
             this.TxtCameraMaxSteps.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtCameraMaxSteps.Location = new System.Drawing.Point(490, 172);
+            this.TxtCameraMaxSteps.Location = new System.Drawing.Point(490, 267);
             this.TxtCameraMaxSteps.Name = "TxtCameraMaxSteps";
             this.TxtCameraMaxSteps.Size = new System.Drawing.Size(81, 26);
             this.TxtCameraMaxSteps.TabIndex = 79;
@@ -3245,7 +3211,7 @@ namespace BZ10
             // 
             this.TxtCameraMinSteps.Enabled = false;
             this.TxtCameraMinSteps.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.TxtCameraMinSteps.Location = new System.Drawing.Point(490, 126);
+            this.TxtCameraMinSteps.Location = new System.Drawing.Point(490, 221);
             this.TxtCameraMinSteps.Name = "TxtCameraMinSteps";
             this.TxtCameraMinSteps.Size = new System.Drawing.Size(81, 26);
             this.TxtCameraMinSteps.TabIndex = 78;
@@ -3375,7 +3341,7 @@ namespace BZ10
             // 
             this.label37.AutoSize = true;
             this.label37.Font = new System.Drawing.Font("宋体", 12F);
-            this.label37.Location = new System.Drawing.Point(414, 176);
+            this.label37.Location = new System.Drawing.Point(414, 271);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(80, 16);
             this.label37.TabIndex = 60;
@@ -3385,7 +3351,7 @@ namespace BZ10
             // 
             this.label38.AutoSize = true;
             this.label38.Font = new System.Drawing.Font("宋体", 12F);
-            this.label38.Location = new System.Drawing.Point(415, 129);
+            this.label38.Location = new System.Drawing.Point(415, 224);
             this.label38.Name = "label38";
             this.label38.Size = new System.Drawing.Size(80, 16);
             this.label38.TabIndex = 58;
@@ -3530,14 +3496,16 @@ namespace BZ10
             // 
             this.serialPort2.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort2_DataReceived);
             // 
-            // pictureBox1
+            // pbLogo
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(25, 20);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(61, 65);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.pbLogo.Image = ((System.Drawing.Image)(resources.GetObject("pbLogo.Image")));
+            this.pbLogo.Location = new System.Drawing.Point(29, 15);
+            this.pbLogo.Name = "pbLogo";
+            this.pbLogo.Size = new System.Drawing.Size(55, 55);
+            this.pbLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbLogo.TabIndex = 0;
+            this.pbLogo.TabStop = false;
+            this.pbLogo.DoubleClick += new System.EventHandler(this.pbLogo_DoubleClick);
             // 
             // label1
             // 
@@ -3582,7 +3550,7 @@ namespace BZ10
             this.panel1.Controls.Add(this.pictureBox3);
             this.panel1.Controls.Add(this.pictureBox2);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Controls.Add(this.pbLogo);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -3717,8 +3685,6 @@ namespace BZ10
             this.groupBox1.ResumeLayout(false);
             this.groupBox15.ResumeLayout(false);
             this.groupBox15.PerformLayout();
-            this.cb_Group2.ResumeLayout(false);
-            this.cb_Group2.PerformLayout();
             this.cb_Group1.ResumeLayout(false);
             this.cb_Group1.PerformLayout();
             this.groupBox13.ResumeLayout(false);
@@ -3727,19 +3693,14 @@ namespace BZ10
             this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox18)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox17)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox16)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox15)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox14)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox13)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox13)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox12)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.groupBox6.ResumeLayout(false);
@@ -3760,7 +3721,7 @@ namespace BZ10
             this.groupBox20.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.panel1.ResumeLayout(false);
@@ -3798,18 +3759,12 @@ namespace BZ10
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.PictureBox pictureBox18;
-        private System.Windows.Forms.PictureBox pictureBox17;
-        private System.Windows.Forms.PictureBox pictureBox16;
-        private System.Windows.Forms.PictureBox pictureBox15;
-        private System.Windows.Forms.PictureBox pictureBox14;
-        private System.Windows.Forms.PictureBox pictureBox7;
         private System.Windows.Forms.PictureBox pictureBox13;
-        private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.PictureBox pictureBox12;
-        private System.Windows.Forms.PictureBox pictureBox9;
-        private System.Windows.Forms.PictureBox pictureBox11;
         private System.Windows.Forms.PictureBox pictureBox10;
+        private System.Windows.Forms.PictureBox pictureBox7;
+        private System.Windows.Forms.PictureBox pictureBox9;
+        private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.GroupBox groupBox6;
@@ -3846,14 +3801,9 @@ namespace BZ10
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.GroupBox groupBox13;
         private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.GroupBox cb_Group2;
-        private System.Windows.Forms.Label lb_yk;
-        private System.Windows.Forms.Label lb_gz;
         private System.Windows.Forms.GroupBox cb_Group1;
-        private System.Windows.Forms.Label lb_sd;
-        private System.Windows.Forms.Label lb_wd;
         private System.IO.Ports.SerialPort serialPort3;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pbLogo;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox3;
@@ -4049,5 +3999,14 @@ namespace BZ10
         private System.Windows.Forms.Button buttonX18;
         private System.Windows.Forms.ComboBox cbNetworkCommunication;
         private System.Windows.Forms.Label label67;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.PictureBox pictureBox11;
+        private System.Windows.Forms.Label label68;
+        private System.Windows.Forms.TextBox txtThermostaticCultureTime;
+        private System.Windows.Forms.Label lblThermostaticCultureTime;
+        private System.Windows.Forms.Label label70;
+        private System.Windows.Forms.TextBox txtCultureTemperature;
+        private System.Windows.Forms.Label label71;
+        private System.Windows.Forms.Label lblTemperature;
     }
 }

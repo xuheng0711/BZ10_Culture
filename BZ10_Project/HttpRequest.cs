@@ -108,6 +108,34 @@ namespace BZ10
             }
         }
 
+        /// <summary>
+        /// Get请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public string Get(string url)
+        {
+            string responseText = "";
+            try
+            {
+                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)WebRequest.Create(url);
+                // 创建一个HTTP请求
+                request.Method = "GET";
+                //返回结果
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using (StreamReader myreader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                {
+                    responseText = myreader.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+            return responseText;
+        }
 
         /// <summary>
         /// Post请求数据

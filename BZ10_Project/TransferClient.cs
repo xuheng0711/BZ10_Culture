@@ -340,7 +340,7 @@ namespace BZ10
         /// <param name="liftRightClearCount">多点选图</param>
         /// <param name="liftRightMoveInterval">移动间隔</param>
         /// <param name="isBug">调试、正常</param>
-        public void sendDevParam(int hour, int time, int sampleminute, int samplemStrength, int peiyangyeCount, int fanshilinCount, int peiyangTime, int minSteps, int maxSteps, int clearCount, int leftMaxSteps, int rightMaxSteps, int liftRightClearCount, int liftRightMoveInterval, int fanStrengthMax, int fanStrengthMin, int tranStepsMin, int tranStepsMax, int tranClearCount, int xCorrecting, int yCorrecting, int yJustRange, int yNegaRange, int yInterval, int yJustCom, int yNageCom, int yFirst, int yCheck, int isBug)
+        public void sendDevParam(int hour, int time, int sampleminute, int samplemStrength, int peiyangyeCount, int fanshilinCount, int peiyangTime, int minSteps, int maxSteps, int clearCount, int leftMaxSteps, int rightMaxSteps, int liftRightClearCount, int liftRightMoveInterval, int fanStrengthMax, int fanStrengthMin, int tranStepsMin, int tranStepsMax, int tranClearCount, int xCorrecting, int yCorrecting, int yJustRange, int yNegaRange, int yInterval, int yJustCom, int yNageCom, int yFirst, int yCheck,decimal cultureTemperature,int thermostaticCultureTime, int isBug)
         {
             try
             {
@@ -377,6 +377,8 @@ namespace BZ10
                 parm.yNageCom = yNageCom;
                 parm.yFirst = yFirst;
                 parm.yCheck = yCheck;
+                parm.cultureTemperature = cultureTemperature;
+                parm.thermostaticCultureTime = thermostaticCultureTime;
                 parm.isBug = isBug;//1是调试，0是在正常
                 dev.message = parm;
                 SendMsg(dev.ObjectToJson());
@@ -414,7 +416,29 @@ namespace BZ10
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
             }
         }
-
+        /// <summary>
+        /// 发送位置信息
+        /// </summary>
+        /// <param name="lat"></param>
+        /// <param name="lon"></param>
+        public void sendLocation(double lat, double lon)
+        {
+            try
+            {
+                LocationMsg location = new LocationMsg();
+                location.devId = global.devid;
+                location.func = 102;
+                location.err = "";
+                location.message.lat = lat;
+                location.message.lon = lon;
+                SendMsg(location.ObjectToJson());
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.DebLog(ex.ToString());
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+        }
         /// <summary>
         /// 发送载玻片数量和当前工作模式
         /// </summary>
@@ -445,7 +469,7 @@ namespace BZ10
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
             }
         }
-        public void sendtimeControl(int replay, String err, String timecontrl)
+        public void sendtimeControl(int replay, String err, List<object> timecontrl)
         {
             try
             {
@@ -517,13 +541,14 @@ namespace BZ10
         /// <param name="func"></param>
         /// <param name="err"></param>
         /// <param name="active"></param>
-        public void SendCurrAction(int func, string err, string active)
+        public void SendCurrAction(int func, string err, string active,string state)
         {
             CurrActive currActive = new CurrActive();
             currActive.func = func;
             currActive.err = err;
             currActive.devId = global.devid;
             currActive.message = active;
+            currActive.state = state;
             SendMsg(currActive.ObjectToJson());
         }
         /// <summary>
@@ -623,6 +648,7 @@ namespace BZ10
         public string err { set; get; }
         public string devId { set; get; }
         public string message { set; get; }//0.原点 1.推片 2.滴加粘附液 3.收集 4.滴加培养液 5.回收 6.复位
+        public string state { get; set; }//设备状态
         public string ObjectToJson()
         {
             JavaScriptSerializer jsonSerialize = new JavaScriptSerializer();
@@ -634,8 +660,7 @@ namespace BZ10
         public string devId { set; get; }
         public string err { set; get; }
         public int func { set; get; }
-
-        public String timecontrol { set; get; }
+        public List<object> timecontrol { set; get; }
 
         public string ObjectToJson()
         {

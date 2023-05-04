@@ -625,6 +625,8 @@ namespace BZ10
         public int yNageCom { set; get; }//纵向负补
         public int yFirst { set; get; }//纵向首选
         public int yCheck { set; get; }//纵向复选
+        public decimal cultureTemperature { get; set; }//恒温仓温度
+        public int thermostaticCultureTime { get; set; }//恒温仓培养时间
         public int isBug { set; get; }
         public string ObjectToJson()
         {
@@ -632,5 +634,24 @@ namespace BZ10
             return jsonSerialize.Serialize(this);
         }
     }
-
+    public class time1Model
+    {
+        public string time1 { get; set; }
+    }
+    public class time2Model
+    {
+        public string time2 { get; set; }
+    }
+    public class time3Model
+    {
+        public string time3 { get; set; }
+    }
+    public class time4Model
+    {
+        public string time4 { get; set; }
+    }
+    public class time5Model
+    {
+        public string time5 { get; set; }
+    }
 }

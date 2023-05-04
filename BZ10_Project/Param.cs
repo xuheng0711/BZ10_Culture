@@ -17,6 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using cn.bmob.io;
 using BZ10.Common;
+using BZ10.Model;
+using Newtonsoft.Json;
 
 namespace BZ10
 {
@@ -146,6 +148,9 @@ namespace BZ10
         public static string isWinRestart = "";//每天电脑是否自动重启  0否  1是
         public static string isContinuousUpload = "";//是否开启连续上传， 0否  1是。【设备默认是每次采集完毕之后进行图像上传以及每天05:00、12:00、22:00进行数据补漏上传，我们将其称之为上传方案1】，开启连续上传之后，方案1即失效，连续上传是按照每次间隔用户设定的检索间隔进行检索上传，假如用户设定的检索间隔为60分钟，则每隔60分钟检索上传一次。
         public static string SearchInterval = "";//检索间隔 分钟 
+        public static string CultureTemperature = "";//培养温度
+        public static string ThermostaticCultureTime = "";//恒温培养时间
+        public static string LogoPictureName = "";//程序图标
 
         #region 传输数据服务器
         public static string IsTransfer = "0";//是否传输数据 0不传输 1传输
@@ -154,11 +159,17 @@ namespace BZ10
         #endregion
 
         #region MQTT服务器
-        public static string MQTTAddress = "";
-        public static string MQTTPort = "";
         public static string MQTTClientID = "";
         public static string MQTTAccount = "";
         public static string MQTTPassword = "";
+        #endregion
+
+        #region 阿里云OSS存储
+        public static string OssEndPoint = "";
+        public static string OssAccessKeyId = "";
+        public static string OssAccessKeySecret = "";
+        public static string OssBucketName = "";
+        public static string OSS_Url = "";
         #endregion
 
         /// <summary>
@@ -371,15 +382,37 @@ namespace BZ10
                 SearchInterval = Read_ConfigParam(configfileName, "Config", "SearchInterval");//连续上传检索间隔
                 if (SearchInterval == "")
                     SearchInterval = "60";
+                CultureTemperature = Read_ConfigParam(configfileName, "Config", "CultureTemperature");//培养温度
+                if (CultureTemperature == "")
+                    CultureTemperature = "25";
+                ThermostaticCultureTime = Read_ConfigParam(configfileName, "Config", "ThermostaticCultureTime");//恒温培养时间
+                if (ThermostaticCultureTime == "")
+                    ThermostaticCultureTime = "60";
+                LogoPictureName = Read_ConfigParam(configfileName, "Config", "LogoPictureName");//程序logo名称
                 IsTransfer = Read_ConfigParam(configfileName, "Transfer", "IsTransfer");//0 不传输 1传输
                 TransferUploadIP = Read_ConfigParam(configfileName, "Transfer", "UploadIP");
                 TransferUploadPort = Read_ConfigParam(configfileName, "Transfer", "UploadPort");
 
-                MQTTAddress = Read_ConfigParam(configfileName, "MQTT", "Address");
-                MQTTPort = Read_ConfigParam(configfileName, "MQTT", "Port");
-                MQTTClientID = Read_ConfigParam(configfileName, "MQTT", "ClientID");
-                MQTTAccount = Read_ConfigParam(configfileName, "MQTT", "Account");
-                MQTTPassword = Read_ConfigParam(configfileName, "MQTT", "Password");
+                #region MQTT客户端信息
+                HttpRequest httpRequest = new HttpRequest();
+                string url = string.Format("http://nyzbwlw.com/situation/http/mqtt/getClientMqtt?eqCode={0}", DeviceID);
+                string strResponse = httpRequest.Get(url);
+                if (!string.IsNullOrEmpty(strResponse))
+                {
+                    DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, string.Format("http接口获取MQTT账号信息：{0}", strResponse));
+                    MQTTClientInfo mqttClient = JsonConvert.DeserializeObject<MQTTClientInfo>(strResponse);
+                    MQTTClientID = mqttClient.result.clientId;
+                    MQTTAccount = mqttClient.result.userName;
+                    MQTTPassword = mqttClient.result.passwords;
+                }
+                #endregion
+
+                OssEndPoint = Read_ConfigParam(configfileName, "AliyunOSS", "EndPoint");
+                OssAccessKeyId = Read_ConfigParam(configfileName, "AliyunOSS", "AccessKeyId");
+                OssAccessKeySecret = Read_ConfigParam(configfileName, "AliyunOSS", "AccessKeySecret");
+                OssBucketName = Read_ConfigParam(configfileName, "AliyunOSS", "BucketName");
+                OSS_Url = Read_ConfigParam(configfileName, "AliyunOSS", "OSS_Url");
+
                 initWorkTimeArray();
                 MainForm.updataConfigShow();
             }
@@ -478,7 +511,19 @@ namespace BZ10
                     {
                         File.Delete(path);
                     }
-                    img.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    string imageExtension = System.IO.Path.GetExtension(imgName);
+                    if (imageExtension.ToLower() == ".jpg")
+                    {
+                        img.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    }
+                    else if (imageExtension.ToLower() == ".png")
+                    {
+                        img.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                    else
+                    {
+                        img.Save(path);
+                    }
                     return true;
                 }
                 return false;
