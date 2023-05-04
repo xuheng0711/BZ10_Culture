@@ -248,6 +248,25 @@ namespace BZ10
             if (Interlocked.Exchange(ref inTimer12, 1) == 0)
             {
                 StartOldNewCamera();
+                #region 雨控
+                byte[] ret = Cmd.CommunicateDp(0xA0, 0);
+                if (ret == null || ret[0] != 0xFF)
+                {
+                    return;
+                }
+                int dirs = (ret[7] << 8) | ret[6];
+                this.Invoke(new EventHandler(delegate
+                {
+                    if (((dirs >> 14) & 0x01) == 1)
+                    {
+                        lblRain.Text = "有雨";
+                    }
+                    else
+                    {
+                        lblRain.Text = "无雨";
+                    }
+                }));
+                #endregion
                 Interlocked.Exchange(ref inTimer12, 0);
             }
         }
@@ -7418,9 +7437,18 @@ namespace BZ10
                     //计算滴加粘附液时间是否达标
                     else if (bStep == 5)
                     {
-                        label30.Text = "滴液时间倒计时:\r\n" + Tools.GetNowTimeSpanSec(startTime.AddSeconds(int.Parse(Param.dropTime)), dt) + " 秒";
+                        double dropTime = 0;
+                        if (Param.DripDevice == "2")
+                        {
+                            dropTime = double.Parse(Param.fanshilin) * 0.01;
+                        }
+                        else
+                        {
+                            dropTime = double.Parse(Param.dropTime);
+                        }
+                        label30.Text = "滴液时间倒计时:\r\n" + Tools.GetNowTimeSpanSec(startTime.AddSeconds(dropTime), dt) + " 秒";
                         //滴加粘附液时间是否达标
-                        if (dt > (startTime.AddSeconds(int.Parse(Param.dropTime))))
+                        if (dt > (startTime.AddSeconds(dropTime)))
                         {
                             label30.Text = "无数据";
                             if (!isLongRangeDebug)
@@ -7489,9 +7517,18 @@ namespace BZ10
                     }
                     else if (bStep == 15)
                     {
-                        label30.Text = "培养时间倒计时:\r\n" + Tools.GetNowTimeSpanSec((startTime.AddSeconds(int.Parse(Param.dropTime))).AddMinutes(Convert.ToInt16(Param.peiyangtime)), dt) + " 秒\r\n(含" + Param.dropTime + "秒滴液时间)";
+                        double dropTime = 0;
+                        if (Param.DripDevice == "2")
+                        {
+                            dropTime = double.Parse(Param.peiyangye) * 0.01;
+                        }
+                        else
+                        {
+                            dropTime = double.Parse(Param.dropTime);
+                        }
+                        label30.Text = "培养时间倒计时:\r\n" + Tools.GetNowTimeSpanSec((startTime.AddSeconds(dropTime)).AddMinutes(Convert.ToInt16(Param.peiyangtime)), dt) + " 秒\r\n(含" + Param.dropTime + "秒滴液时间)";
                         //滴加培养液时间是否达标
-                        if (dt > (startTime.AddSeconds(int.Parse(Param.dropTime))))
+                        if (dt > (startTime.AddSeconds(dropTime)))
                         {
                             //培养时间是否达标
                             if (dt > ((startTime.AddSeconds(int.Parse(Param.dropTime))).AddMinutes(Convert.ToInt16(Param.peiyangtime))))
