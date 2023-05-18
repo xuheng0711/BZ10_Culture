@@ -477,7 +477,7 @@ namespace BZ10
                 msg.func = replay;
                 msg.err = err;
                 msg.devId = global.devid;
-                msg.timecontrol = timecontrl;
+                msg.message = timecontrl;
 
                 SendMsg(msg.ObjectToJson());
             }
