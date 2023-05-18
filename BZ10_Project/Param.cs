@@ -741,10 +741,7 @@ namespace BZ10
             this.md5 = input.getString("md5");
         }
     }
-    public class TimeRoot
-    {
-        public List<string> timecontrol = new List<string>();
-    }
+
     //public class SofeVersion : BmobTable
     //{
     //    public string version_i { get; set; }

@@ -595,7 +595,7 @@ namespace BZ10
         }
 
         /* 发送设备时间段*/
-        public void sendtimeControl(int replay, String err, List<object> timecontrl)
+        public void sendtimeControl(int replay, String err, string timecontrl)
         {
             try
             {
@@ -603,7 +603,7 @@ namespace BZ10
                 msg.func = replay;
                 msg.err = err;
                 msg.devId = global.devid;
-                msg.timecontrol = timecontrl;
+                msg.message = timecontrl;
 
                 SendMsg(msg.ObjectToJson());
             }
@@ -754,7 +754,7 @@ namespace BZ10
             public string err { set; get; }
             public int func { set; get; }
 
-            public List<object> timecontrol { set; get; }
+            public string message { set; get; }
 
             public string ObjectToJson()
             {

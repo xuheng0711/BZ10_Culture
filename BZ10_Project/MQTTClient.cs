@@ -401,7 +401,7 @@ namespace BZ10
         /// <param name="replay"></param>
         /// <param name="err"></param>
         /// <param name="timecontrl"></param>
-        public void sendtimeControl(int replay, String err, List<object> timecontrl)
+        public void sendtimeControl(int replay, String err, string timecontrl)
         {
             try
             {
@@ -409,7 +409,7 @@ namespace BZ10
                 msg.func = replay;
                 msg.err = err;
                 msg.devId = Param.DeviceID;
-                msg.timecontrol = timecontrl;
+                msg.message = timecontrl;
 
                 publishMessage(msg.ObjectToJson());
             }

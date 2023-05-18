@@ -469,7 +469,7 @@ namespace BZ10
                 DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
             }
         }
-        public void sendtimeControl(int replay, String err, List<object> timecontrl)
+        public void sendtimeControl(int replay, String err, string timecontrl)
         {
             try
             {
@@ -660,7 +660,7 @@ namespace BZ10
         public string devId { set; get; }
         public string err { set; get; }
         public int func { set; get; }
-        public List<object> timecontrol { set; get; }
+        public string message { set; get; }
 
         public string ObjectToJson()
         {

@@ -1884,16 +1884,9 @@ namespace BZ10
                                 int currRunMode1 = this.TxtRunMode.SelectedIndex;//当前工作模式
                                 tcpclient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
-                            case 135: //获取工作时段 服务器→上位机
-                                List<object> listTimes = new List<object>()
-                                {
-                                    new time1Model(){ time1=Param.work1},
-                                    new time2Model(){ time2=Param.work2},
-                                    new time3Model(){ time3=Param.work3},
-                                    new time4Model(){ time4=Param.work4},
-                                    new time5Model(){ time5=Param.work5}
-                                };
-                                tcpclient.sendtimeControl(135, "", listTimes);
+                            case 135: //获取工作时段 服务器→上位机               
+                                List<string> listTimes = new List<string>() { Param.work1, Param.work2, Param.work3, Param.work4, Param.work5 };
+                                tcpclient.sendtimeControl(135, "", JsonConvert.SerializeObject(listTimes));
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 tcpclient.sendWorkMode(Param.RunFlag);
@@ -2135,20 +2128,12 @@ namespace BZ10
                                 break;
                             case 133: //设置工作时段 服务器→上位机
                                 string msgg = jo["message"].ToString();
-                                int a = msgg.IndexOf(':');
-                                string str1 = msgg.Substring(0, a + 1);
-                                int b = msgg.IndexOf('[');
-                                int c = msgg.IndexOf(']');
-                                string str2 = msgg.Substring(b);
-                                int d = str2.IndexOf(']');
-                                string str3 = str2.Substring(0, d + 1);
-                                string str4 = str2.Substring(str2.Length - 1);
-                                string strz = str1 + str3 + str4;//去掉了转义字符之后的
-                                TimeRoot root1 = new TimeRoot();
-                                root1 = JsonConvert.DeserializeObject<TimeRoot>(strz);
-                                while (root1.timecontrol.Count < 5)
-                                    root1.timecontrol.Add("00:00-00:00");
-                                writeWorktime(root1.timecontrol);
+                                List<string> listTime = JsonConvert.DeserializeObject<List<string>>(msgg);
+                                while (listTime.Count < 5)
+                                {
+                                    listTime.Add("00:00-00:00");
+                                }
+                                writeWorktime(listTime);
                                 tcpclient.Replay(133, "success", "");
                                 break;
                             /*
@@ -2373,16 +2358,9 @@ namespace BZ10
                                 transferClient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
                             case 135: //获取工作时段 服务器→上位机
-                                //发送时间段
-                                List<object> listTimes = new List<object>()
-                                {
-                                    new time1Model(){ time1=Param.work1},
-                                    new time2Model(){ time2=Param.work2},
-                                    new time3Model(){ time3=Param.work3},
-                                    new time4Model(){ time4=Param.work4},
-                                    new time5Model(){ time5=Param.work5}
-                                };
-                                transferClient.sendtimeControl(135, "", listTimes);
+                                //发送时间段                   
+                                List<string> listTimes = new List<string>() { Param.work1, Param.work2, Param.work3, Param.work4, Param.work5 };
+                                transferClient.sendtimeControl(135, "", JsonConvert.SerializeObject(listTimes));
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 transferClient.sendWorkMode(Param.RunFlag);
@@ -2624,20 +2602,12 @@ namespace BZ10
                                 break;
                             case 133: //设置工作时段 服务器→上位机
                                 string msgg = jo["message"].ToString();
-                                int a = msgg.IndexOf(':');
-                                string str1 = msgg.Substring(0, a + 1);
-                                int b = msgg.IndexOf('[');
-                                int c = msgg.IndexOf(']');
-                                string str2 = msgg.Substring(b);
-                                int d = str2.IndexOf(']');
-                                string str3 = str2.Substring(0, d + 1);
-                                string str4 = str2.Substring(str2.Length - 1);
-                                string strz = str1 + str3 + str4;//去掉了转义字符之后的
-                                TimeRoot root1 = new TimeRoot();
-                                root1 = JsonConvert.DeserializeObject<TimeRoot>(strz);
-                                while (root1.timecontrol.Count < 5)
-                                    root1.timecontrol.Add("00:00-00:00");
-                                writeWorktime(root1.timecontrol);
+                                List<string> listTime = JsonConvert.DeserializeObject<List<string>>(msgg);
+                                while (listTime.Count < 5)
+                                {
+                                    listTime.Add("00:00-00:00");
+                                }
+                                writeWorktime(listTime);
                                 transferClient.Replay(133, "success", "");
                                 break;
                             /*
@@ -2871,15 +2841,8 @@ namespace BZ10
                                 mqttClient.SendSlideGlassCount(134, "", remain1, currRunMode1, (float)wd);
                                 break;
                             case 135: //获取工作时段 服务器→上位机
-                                List<object> listTimes = new List<object>()
-                                {
-                                    new time1Model(){ time1=Param.work1},
-                                    new time2Model(){ time2=Param.work2},
-                                    new time3Model(){ time3=Param.work3},
-                                    new time4Model(){ time4=Param.work4},
-                                    new time5Model(){ time5=Param.work5}
-                                };
-                                mqttClient.sendtimeControl(135, "", listTimes);
+                                List<string> listTimes = new List<string>() { Param.work1, Param.work2, Param.work3, Param.work4, Param.work5 };
+                                mqttClient.sendtimeControl(135, "", JsonConvert.SerializeObject(listTimes));
                                 break;
                             case 136://获取当前工作模式 服务器→上位机
                                 mqttClient.sendWorkMode(Param.RunFlag);
@@ -3121,20 +3084,12 @@ namespace BZ10
                                 break;
                             case 133: //设置工作时段 服务器→上位机
                                 string msgg = jo["message"].ToString();
-                                int a = msgg.IndexOf(':');
-                                string str1 = msgg.Substring(0, a + 1);
-                                int b = msgg.IndexOf('[');
-                                int c = msgg.IndexOf(']');
-                                string str2 = msgg.Substring(b);
-                                int d = str2.IndexOf(']');
-                                string str3 = str2.Substring(0, d + 1);
-                                string str4 = str2.Substring(str2.Length - 1);
-                                string strz = str1 + str3 + str4;//去掉了转义字符之后的
-                                TimeRoot root1 = new TimeRoot();
-                                root1 = JsonConvert.DeserializeObject<TimeRoot>(strz);
-                                while (root1.timecontrol.Count < 5)
-                                    root1.timecontrol.Add("00:00-00:00");
-                                writeWorktime(root1.timecontrol);
+                                List<string> listTime = JsonConvert.DeserializeObject<List<string>>(msgg);
+                                while (listTime.Count < 5)
+                                {
+                                    listTime.Add("00:00-00:00");
+                                }
+                                writeWorktime(listTime);
                                 mqttClient.Replay(133, "success", "");
                                 break;
                             /*
@@ -9790,25 +9745,19 @@ namespace BZ10
             Param.Set_ConfigParm(configfileName, "Config", "work5", work5);
 
             //发送时间段
-            List<object> listTimes = new List<object>()
-            {
-                new time1Model(){ time1=work1},
-                new time2Model(){ time2=work2},
-                new time3Model(){ time3=work3},
-                new time4Model(){ time4=work4},
-                new time5Model(){ time5=work5}
-            };
+            List<string> listTimes = new List<string>() { work1, work2, work3, work4, work5 };
+            string strTimeControl = JsonConvert.SerializeObject(listTimes);
             if (Param.NetworkCommunication == "0")
             {
-                tcpclient.sendtimeControl(135, "", listTimes);
+                tcpclient.sendtimeControl(135, "", strTimeControl);
                 if (Param.IsTransfer == "1")
                 {
-                    transferClient.sendtimeControl(135, "", listTimes);
+                    transferClient.sendtimeControl(135, "", strTimeControl);
                 }
             }
             else if (Param.NetworkCommunication == "2")
             {
-                mqttClient.sendtimeControl(135, "", listTimes);
+                mqttClient.sendtimeControl(135, "", strTimeControl);
             }
         }
 
