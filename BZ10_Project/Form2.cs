@@ -152,6 +152,7 @@ namespace BZ10
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Timer1Stop();
             SoftKeyboardCtrl.CloseWindow();
         }
         #endregion
@@ -840,10 +841,14 @@ namespace BZ10
         private void btnStopCulture_Click(object sender, EventArgs e)
         {
             CommunicateDp(0x95, 0);
+            Timer1Stop();
+        }
+
+        private void Timer1Stop()
+        {
             timer1.Stop();
             Interlocked.Exchange(ref inTimer1, 0);
         }
-
 
         /// <summary>
         /// 恒温仓温度读取
