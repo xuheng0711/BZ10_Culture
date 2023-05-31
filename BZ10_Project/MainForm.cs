@@ -8863,6 +8863,7 @@ namespace BZ10
                     if (ret == null || ret[0] != 0xFF)
                     {
                         DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "恒温仓温度读取失败！");
+                        Interlocked.Exchange(ref inTimer6, 0);
                         return;
                     }
                     int retValue = (ret[5] << 24) | (ret[6] << 16) | (ret[7] << 8) | ret[8];

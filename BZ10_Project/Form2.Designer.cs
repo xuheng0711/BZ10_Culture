@@ -146,6 +146,10 @@
             this.groupBox14 = new System.Windows.Forms.GroupBox();
             this.button37 = new System.Windows.Forms.Button();
             this.groupBox15 = new System.Windows.Forms.GroupBox();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.btnStartCulture = new System.Windows.Forms.Button();
+            this.btnStopCulture = new System.Windows.Forms.Button();
+            this.lblTemperature = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -159,6 +163,7 @@
             this.groupBox13.SuspendLayout();
             this.groupBox14.SuspendLayout();
             this.groupBox15.SuspendLayout();
+            this.groupBox10.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -242,7 +247,8 @@
             "滴加粘附液位置",
             "吸孢子位置",
             "培养液位置",
-            "拍照位置"});
+            "拍照位置",
+            "恒温培养箱"});
             this.cb_z1.Location = new System.Drawing.Point(86, 22);
             this.cb_z1.Name = "cb_z1";
             this.cb_z1.Size = new System.Drawing.Size(121, 22);
@@ -669,7 +675,7 @@
             this.groupBox7.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox7.Location = new System.Drawing.Point(314, 175);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(292, 81);
+            this.groupBox7.Size = new System.Drawing.Size(292, 69);
             this.groupBox7.TabIndex = 6;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "粘附液电机5";
@@ -724,9 +730,9 @@
             this.groupBox8.Controls.Add(this.cb_dir6);
             this.groupBox8.Controls.Add(this.label12);
             this.groupBox8.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox8.Location = new System.Drawing.Point(314, 262);
+            this.groupBox8.Location = new System.Drawing.Point(314, 246);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(291, 81);
+            this.groupBox8.Size = new System.Drawing.Size(291, 67);
             this.groupBox8.TabIndex = 7;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "培养液注射6";
@@ -734,7 +740,7 @@
             // button15
             // 
             this.button15.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button15.Location = new System.Drawing.Point(228, 35);
+            this.button15.Location = new System.Drawing.Point(228, 31);
             this.button15.Name = "button15";
             this.button15.Size = new System.Drawing.Size(52, 24);
             this.button15.TabIndex = 7;
@@ -745,7 +751,7 @@
             // tb_step6
             // 
             this.tb_step6.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.tb_step6.Location = new System.Drawing.Point(165, 35);
+            this.tb_step6.Location = new System.Drawing.Point(165, 31);
             this.tb_step6.Name = "tb_step6";
             this.tb_step6.Size = new System.Drawing.Size(59, 23);
             this.tb_step6.TabIndex = 6;
@@ -759,7 +765,7 @@
             this.cb_dir6.Items.AddRange(new object[] {
             "顺时针",
             "逆时针"});
-            this.cb_dir6.Location = new System.Drawing.Point(84, 35);
+            this.cb_dir6.Location = new System.Drawing.Point(84, 31);
             this.cb_dir6.Name = "cb_dir6";
             this.cb_dir6.Size = new System.Drawing.Size(76, 22);
             this.cb_dir6.TabIndex = 5;
@@ -768,7 +774,7 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label12.Location = new System.Drawing.Point(8, 38);
+            this.label12.Location = new System.Drawing.Point(8, 34);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(70, 14);
             this.label12.TabIndex = 4;
@@ -784,7 +790,7 @@
             this.groupBox9.Controls.Add(this.label13);
             this.groupBox9.Controls.Add(this.button19);
             this.groupBox9.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox9.Location = new System.Drawing.Point(314, 349);
+            this.groupBox9.Location = new System.Drawing.Point(315, 404);
             this.groupBox9.Name = "groupBox9";
             this.groupBox9.Size = new System.Drawing.Size(291, 111);
             this.groupBox9.TabIndex = 8;
@@ -1395,9 +1401,9 @@
             this.groupBox13.Controls.Add(this.comboBox3);
             this.groupBox13.Controls.Add(this.label25);
             this.groupBox13.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox13.Location = new System.Drawing.Point(314, 466);
+            this.groupBox13.Location = new System.Drawing.Point(314, 521);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(291, 81);
+            this.groupBox13.Size = new System.Drawing.Size(291, 58);
             this.groupBox13.TabIndex = 22;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "镜头电机";
@@ -1405,7 +1411,7 @@
             // button36
             // 
             this.button36.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button36.Location = new System.Drawing.Point(228, 35);
+            this.button36.Location = new System.Drawing.Point(228, 26);
             this.button36.Name = "button36";
             this.button36.Size = new System.Drawing.Size(52, 24);
             this.button36.TabIndex = 7;
@@ -1416,7 +1422,7 @@
             // Txt1
             // 
             this.Txt1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Txt1.Location = new System.Drawing.Point(165, 35);
+            this.Txt1.Location = new System.Drawing.Point(165, 26);
             this.Txt1.Name = "Txt1";
             this.Txt1.Size = new System.Drawing.Size(59, 23);
             this.Txt1.TabIndex = 6;
@@ -1430,7 +1436,7 @@
             this.comboBox3.Items.AddRange(new object[] {
             "Pc8限位",
             "Pc9限位"});
-            this.comboBox3.Location = new System.Drawing.Point(84, 35);
+            this.comboBox3.Location = new System.Drawing.Point(84, 26);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(76, 22);
             this.comboBox3.TabIndex = 5;
@@ -1439,7 +1445,7 @@
             // 
             this.label25.AutoSize = true;
             this.label25.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label25.Location = new System.Drawing.Point(8, 38);
+            this.label25.Location = new System.Drawing.Point(8, 29);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(70, 14);
             this.label25.TabIndex = 4;
@@ -1462,7 +1468,7 @@
             // button37
             // 
             this.button37.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button37.Location = new System.Drawing.Point(33, 32);
+            this.button37.Location = new System.Drawing.Point(99, 22);
             this.button37.Name = "button37";
             this.button37.Size = new System.Drawing.Size(85, 24);
             this.button37.TabIndex = 2;
@@ -1474,18 +1480,63 @@
             // 
             this.groupBox15.Controls.Add(this.button37);
             this.groupBox15.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox15.Location = new System.Drawing.Point(314, 553);
+            this.groupBox15.Location = new System.Drawing.Point(314, 579);
             this.groupBox15.Name = "groupBox15";
-            this.groupBox15.Size = new System.Drawing.Size(291, 81);
+            this.groupBox15.Size = new System.Drawing.Size(291, 51);
             this.groupBox15.TabIndex = 25;
             this.groupBox15.TabStop = false;
             this.groupBox15.Text = "履带电机";
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.lblTemperature);
+            this.groupBox10.Controls.Add(this.btnStopCulture);
+            this.groupBox10.Controls.Add(this.btnStartCulture);
+            this.groupBox10.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox10.Location = new System.Drawing.Point(315, 320);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Size = new System.Drawing.Size(291, 76);
+            this.groupBox10.TabIndex = 26;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "恒温培养箱7";
+            // 
+            // btnStartCulture
+            // 
+            this.btnStartCulture.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnStartCulture.Location = new System.Drawing.Point(167, 45);
+            this.btnStartCulture.Name = "btnStartCulture";
+            this.btnStartCulture.Size = new System.Drawing.Size(52, 24);
+            this.btnStartCulture.TabIndex = 8;
+            this.btnStartCulture.Text = "开启";
+            this.btnStartCulture.UseVisualStyleBackColor = true;
+            this.btnStartCulture.Click += new System.EventHandler(this.btnStartCulture_Click);
+            // 
+            // btnStopCulture
+            // 
+            this.btnStopCulture.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnStopCulture.Location = new System.Drawing.Point(233, 45);
+            this.btnStopCulture.Name = "btnStopCulture";
+            this.btnStopCulture.Size = new System.Drawing.Size(52, 24);
+            this.btnStopCulture.TabIndex = 11;
+            this.btnStopCulture.Text = "关闭";
+            this.btnStopCulture.UseVisualStyleBackColor = true;
+            this.btnStopCulture.Click += new System.EventHandler(this.btnStopCulture_Click);
+            // 
+            // lblTemperature
+            // 
+            this.lblTemperature.AutoSize = true;
+            this.lblTemperature.Location = new System.Drawing.Point(73, 32);
+            this.lblTemperature.Name = "lblTemperature";
+            this.lblTemperature.Size = new System.Drawing.Size(32, 16);
+            this.lblTemperature.TabIndex = 12;
+            this.lblTemperature.Text = "0℃";
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(890, 643);
+            this.Controls.Add(this.groupBox10);
             this.Controls.Add(this.groupBox15);
             this.Controls.Add(this.groupBox14);
             this.Controls.Add(this.groupBox12);
@@ -1533,6 +1584,8 @@
             this.groupBox14.ResumeLayout(false);
             this.groupBox14.PerformLayout();
             this.groupBox15.ResumeLayout(false);
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1656,5 +1709,9 @@
         private System.Windows.Forms.GroupBox groupBox14;
         private System.Windows.Forms.Button button37;
         private System.Windows.Forms.GroupBox groupBox15;
+        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.Button btnStopCulture;
+        private System.Windows.Forms.Button btnStartCulture;
+        private System.Windows.Forms.Label lblTemperature;
     }
 }

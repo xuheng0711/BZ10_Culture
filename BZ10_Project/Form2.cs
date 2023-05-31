@@ -19,10 +19,14 @@ namespace BZ10
         DevStatus devstatus = new DevStatus();
         List<byte> list = new List<byte>(); //待查询状态
         Label[] ct = null;
+        int inTimer1 = 0;
+        System.Timers.Timer timer1 = new System.Timers.Timer();
         public Form2()
         {
             InitializeComponent();
             ct = new Label[] { lb_X1, lb_X2, lb_X3, lb_X4, lb_X5, lb_X6, lb_X7, lb_X8, lb_X9, lb_X10, lb_X11, lb_X12, lb_X13, lb_X14, lb_X15 };//初始化数组
+            timer1.Elapsed += new ElapsedEventHandler(timer1_Elapsed);//恒温仓温度读取
+            timer1.Interval = 1000;
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -504,7 +508,7 @@ namespace BZ10
                 }
                 if (serialPort4 != null || serialPort4.IsOpen)
                 {
-                    if (Param.DripDevice == "1"|| Param.DripDevice == "2")
+                    if (Param.DripDevice == "1" || Param.DripDevice == "2")
                     {
                         string stuta = PushingFluidRead();
                         if (stuta == "00")
@@ -826,5 +830,52 @@ namespace BZ10
 
         #endregion
 
+        private void btnStartCulture_Click(object sender, EventArgs e)
+        {
+            int nCultureTemperature = (int)(double.Parse(Param.CultureTemperature) * 10);
+            CommunicateDp(0x94, nCultureTemperature);
+            timer1.Start();
+        }
+
+        private void btnStopCulture_Click(object sender, EventArgs e)
+        {
+            CommunicateDp(0x95, 0);
+            timer1.Stop();
+            Interlocked.Exchange(ref inTimer1, 0);
+        }
+
+
+        /// <summary>
+        /// 恒温仓温度读取
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer1_Elapsed(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Interlocked.Exchange(ref inTimer1, 1) == 0)
+                {
+                    byte[] ret = CommunicateDp(0xB0, 0);
+                    if (ret == null || ret[0] != 0xFF)
+                    {
+                        Interlocked.Exchange(ref inTimer1, 0);
+                        return;
+                    }
+                    int retValue = (ret[5] << 24) | (ret[6] << 16) | (ret[7] << 8) | ret[8];
+                    this.Invoke(new EventHandler(delegate
+                    {
+                        lblTemperature.Text = string.Format("{0:F1}℃", retValue / 10.0);
+                    }));
+
+                    Interlocked.Exchange(ref inTimer1, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                DebOutPut.WriteLog(LogType.Error, LogDetailedType.Ordinary, ex.ToString());
+            }
+
+        }
     }
 }
