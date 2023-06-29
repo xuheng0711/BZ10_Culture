@@ -99,6 +99,8 @@ namespace BZ10
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox17 = new System.Windows.Forms.GroupBox();
+            this.lblRain = new System.Windows.Forms.Label();
             this.groupBox15 = new System.Windows.Forms.GroupBox();
             this.label30 = new System.Windows.Forms.Label();
             this.cb_Group1 = new System.Windows.Forms.GroupBox();
@@ -306,8 +308,6 @@ namespace BZ10
             this.serialPort4 = new System.IO.Ports.SerialPort(this.components);
             this.panel3 = new System.Windows.Forms.Panel();
             this.label61 = new System.Windows.Forms.Label();
-            this.groupBox17 = new System.Windows.Forms.GroupBox();
-            this.lblRain = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage0.SuspendLayout();
             this.groupBox16.SuspendLayout();
@@ -335,6 +335,7 @@ namespace BZ10
             this.groupBox2.SuspendLayout();
             this.groupBox10.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox17.SuspendLayout();
             this.groupBox15.SuspendLayout();
             this.cb_Group1.SuspendLayout();
             this.groupBox13.SuspendLayout();
@@ -365,7 +366,6 @@ namespace BZ10
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
-            this.groupBox17.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -1308,6 +1308,28 @@ namespace BZ10
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "设备状态";
+            // 
+            // groupBox17
+            // 
+            this.groupBox17.Controls.Add(this.lblRain);
+            this.groupBox17.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox17.Location = new System.Drawing.Point(662, 28);
+            this.groupBox17.Name = "groupBox17";
+            this.groupBox17.Size = new System.Drawing.Size(207, 53);
+            this.groupBox17.TabIndex = 31;
+            this.groupBox17.TabStop = false;
+            this.groupBox17.Text = "雨控";
+            this.groupBox17.Visible = false;
+            // 
+            // lblRain
+            // 
+            this.lblRain.AutoSize = true;
+            this.lblRain.ForeColor = System.Drawing.Color.Black;
+            this.lblRain.Location = new System.Drawing.Point(13, 26);
+            this.lblRain.Name = "lblRain";
+            this.lblRain.Size = new System.Drawing.Size(56, 16);
+            this.lblRain.TabIndex = 0;
+            this.lblRain.Text = "无数据";
             // 
             // groupBox15
             // 
@@ -3637,28 +3659,7 @@ namespace BZ10
             this.label61.Size = new System.Drawing.Size(190, 14);
             this.label61.TabIndex = 9;
             this.label61.Text = "系统当前登录用户： zhao2";
-            // 
-            // groupBox17
-            // 
-            this.groupBox17.Controls.Add(this.lblRain);
-            this.groupBox17.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox17.Location = new System.Drawing.Point(662, 28);
-            this.groupBox17.Name = "groupBox17";
-            this.groupBox17.Size = new System.Drawing.Size(207, 53);
-            this.groupBox17.TabIndex = 31;
-            this.groupBox17.TabStop = false;
-            this.groupBox17.Text = "雨控";
-            // 
-            // lblRain
-            // 
-            this.lblRain.AutoSize = true;
-            this.lblRain.ForeColor = System.Drawing.Color.Black;
-            this.lblRain.Location = new System.Drawing.Point(13, 26);
-            this.lblRain.Name = "lblRain";
-            this.lblRain.Size = new System.Drawing.Size(56, 16);
-            this.lblRain.TabIndex = 0;
-            this.lblRain.Text = "无数据";
-            // 
+            //          
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -3708,6 +3709,8 @@ namespace BZ10
             this.groupBox2.PerformLayout();
             this.groupBox10.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
+            this.groupBox17.ResumeLayout(false);
+            this.groupBox17.PerformLayout();
             this.groupBox15.ResumeLayout(false);
             this.groupBox15.PerformLayout();
             this.cb_Group1.ResumeLayout(false);
@@ -3753,8 +3756,6 @@ namespace BZ10
             this.panel1.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
-            this.groupBox17.ResumeLayout(false);
-            this.groupBox17.PerformLayout();
             this.ResumeLayout(false);
 
         }
