@@ -9,7 +9,7 @@ namespace BZ10
     class DevStatus
     {
         public string status = "";   //查询状态
-        public byte[] bits = new byte[14];//状态指示位
+        public byte[] bits = new byte[18];//状态指示位
         public bool bReady = true;//false 未就位，true 已就位
         List<byte> dele = new List<byte>();//已经到位置的限位
         public void clear()
@@ -17,7 +17,7 @@ namespace BZ10
             try
             {
                 bReady = true;
-                for (int i = 0; i < 14; i++)
+                for (int i = 0; i < 18; i++)
                 {
                     bits[i] = 0;
                 }
