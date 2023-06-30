@@ -1541,6 +1541,7 @@ namespace BZ10
             try
             {
                 Thread.Sleep(5000);
+                Cmd.CommunicateDp(0x95, 0);//关闭培养箱
                 //2. 推片准备：轴3 到原点位置 轴4到原点位置/推完片位置
                 Cmd.CommunicateDp(0x33, 1);
                 DebOutPut.DebLog("执行0x33完毕");
