@@ -5780,12 +5780,13 @@ namespace BZ10
         /// </summary>
         private void CameraGUIwei()
         {
-            bStep = 9;
-            Cmd.CommunicateDp(0x13, 4);
+            
+            bStep = 16;
+            Cmd.CommunicateDp(0x13, 6);
             list.Clear();
-            list.Add(3);
+            list.Add(17);
             /*
-             * 开始计时到培养液位置时间
+             * 开始计时到恒温培养箱位置时间
              */
             startTime = DateTime.Now;
             timer2.Start();

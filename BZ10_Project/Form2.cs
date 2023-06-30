@@ -841,7 +841,7 @@ namespace BZ10
         private void btnStopCulture_Click(object sender, EventArgs e)
         {
             CommunicateDp(0x95, 0);
-            Timer1Stop();
+            Timer1Stop();                                                                                     
         }
 
         private void Timer1Stop()
