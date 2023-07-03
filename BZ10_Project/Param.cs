@@ -151,6 +151,7 @@ namespace BZ10
         public static string CultureTemperature = "";//培养温度
         public static string ThermostaticCultureTime = "";//恒温培养时间
         public static string LogoPictureName = "";//程序图标
+        public static string DeviceTitle = "";//程序标题
 
         #region 传输数据服务器
         public static string IsTransfer = "0";//是否传输数据 0不传输 1传输
@@ -222,6 +223,7 @@ namespace BZ10
                 DebOutPut.DebLog("初始化参数");
                 UploadIP = Read_ConfigParam(configfileName, "Config", "UploadIP");//服务器IP
                 UploadPort = Read_ConfigParam(configfileName, "Config", "UploadPort");//服务器端口
+                DeviceTitle = Read_ConfigParam(configfileName, "Config", "DeviceTitle");//设备标题
                 DeviceID = Read_ConfigParam(configfileName, "Config", "DeviceID");//设备编号
                 CollectHour = Read_ConfigParam(configfileName, "Config", "CollectHour");//定时 时
                 CollectMinute = Read_ConfigParam(configfileName, "Config", "CollectMinute");//定时 分

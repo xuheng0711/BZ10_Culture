@@ -297,7 +297,7 @@ namespace BZ10
             this.serialPort2 = new System.IO.Ports.SerialPort(this.components);
             this.serialPort3 = new System.IO.Ports.SerialPort(this.components);
             this.pbLogo = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -3533,19 +3533,18 @@ namespace BZ10
             this.pbLogo.TabStop = false;
             this.pbLogo.DoubleClick += new System.EventHandler(this.pbLogo_DoubleClick);
             // 
-            // label1
+            // lblTitle
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.lblTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 34F, System.Drawing.FontStyle.Bold);
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(97, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(537, 46);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "智能孢子捕捉预测分析仪";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("宋体", 34F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(97, 20);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(0, 46);
+            this.lblTitle.TabIndex = 1;
+            this.lblTitle.Click += new System.EventHandler(this.label1_Click);
             // 
             // pictureBox2
             // 
@@ -3575,7 +3574,7 @@ namespace BZ10
             this.panel1.Controls.Add(this.LabTimeShow);
             this.panel1.Controls.Add(this.pictureBox3);
             this.panel1.Controls.Add(this.pictureBox2);
-            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.lblTitle);
             this.panel1.Controls.Add(this.pbLogo);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -3659,7 +3658,7 @@ namespace BZ10
             this.label61.Size = new System.Drawing.Size(190, 14);
             this.label61.TabIndex = 9;
             this.label61.Text = "系统当前登录用户： zhao2";
-            //          
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -3832,7 +3831,7 @@ namespace BZ10
         private System.Windows.Forms.GroupBox cb_Group1;
         private System.IO.Ports.SerialPort serialPort3;
         private System.Windows.Forms.PictureBox pbLogo;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.Panel panel1;

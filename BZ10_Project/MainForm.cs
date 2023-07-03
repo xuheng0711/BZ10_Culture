@@ -1127,6 +1127,7 @@ namespace BZ10
                 Cmd.CommunicateDp(0x40, 0);//轴四找原点
                 DebOutPut.DebLog("轴四找原点");
                 Cmd.CommunicateDp(0x93, 0);//关闭风机和补光
+                Cmd.CommunicateDp(0x95, 0);//关闭培养箱
                 DebOutPut.DebLog("关闭风机和补光");
                 bStep = 0;//
                 list.Clear();
@@ -1540,8 +1541,7 @@ namespace BZ10
         {
             try
             {
-                Thread.Sleep(5000);
-                Cmd.CommunicateDp(0x95, 0);//关闭培养箱
+                Thread.Sleep(5000);              
                 //2. 推片准备：轴3 到原点位置 轴4到原点位置/推完片位置
                 Cmd.CommunicateDp(0x33, 1);
                 DebOutPut.DebLog("执行0x33完毕");
@@ -3712,6 +3712,8 @@ namespace BZ10
                     DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "初始化读取状态失败！");
                     return;
                 }
+                Cmd.CommunicateDp(0x95, 0);//关闭培养箱
+                DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "执行终止恒温培养箱");
                 int dirs = (ret[7] << 8) | ret[6];
                 DebOutPut.DebLog("初始化：dirs值：" + dirs);
                 DebOutPut.WriteLog(LogType.Normal, LogDetailedType.Ordinary, "初始化：dirs值：" + dirs);
@@ -9222,6 +9224,12 @@ namespace BZ10
                 Image image = Image.FromFile(imagePath);
                 pbLogo.Image = image;
             }
+            string deviceTitle = "智能孢子捕捉预测分析仪";
+            if (!string.IsNullOrEmpty(Param.DeviceTitle))
+            {
+                deviceTitle = Param.DeviceTitle;
+            }
+            this.lblTitle.Text = deviceTitle;
             this.txt_IP.Text = Param.UploadIP;
             this.txt_Port.Text = Param.UploadPort;
             this.txt_Hour.Text = Param.CollectHour;
