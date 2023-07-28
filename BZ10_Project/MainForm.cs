@@ -9224,7 +9224,7 @@ namespace BZ10
                 Image image = Image.FromFile(imagePath);
                 pbLogo.Image = image;
             }
-            string deviceTitle = "智能孢子捕捉预测分析仪";
+            string deviceTitle = "智能恒温孢子捕捉预测分析仪";
             if (!string.IsNullOrEmpty(Param.DeviceTitle))
             {
                 deviceTitle = Param.DeviceTitle;
